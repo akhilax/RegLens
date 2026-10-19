@@ -1,0 +1,24 @@
+{
+  "name": "reglens",
+  "version": "1.0.0",
+  "private": true,
+  "description": "RegLens — traceable RAG-powered transaction compliance assistant (Fintech Hackathon)",
+  "scripts": {
+    "setup": "node scripts/py.mjs scripts/setup.py",
+    "seed": "node scripts/py.mjs scripts/seed.py",
+    "dev": "concurrently -k -n api,web -c magenta,cyan \"npm:dev:api\" \"npm:dev:web\"",
+    "dev:api": "node scripts/py.mjs scripts/dev.py api",
+    "dev:web": "npm --prefix frontend run dev",
+    "test": "npm run test:api && npm run test:web",
+    "test:api": "node scripts/py.mjs scripts/dev.py test",
+    "test:web": "npm --prefix frontend run lint && npm --prefix frontend run typecheck",
+    "lint": "node scripts/py.mjs scripts/dev.py lint && npm --prefix frontend run lint",
+    "build": "npm --prefix frontend run build",
+    "eval": "node scripts/py.mjs scripts/dev.py eval",
+    "gen:types": "node scripts/py.mjs scripts/dev.py openapi && npm --prefix frontend run gen:types",
+    "qa": "npm --prefix frontend run qa"
+  },
+  "devDependencies": {
+    "concurrently": "9.2.1"
+  }
+}

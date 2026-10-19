@@ -1,0 +1,4 @@
+# Optional: semantic embeddings + persistent vector DB.
+# Without these, RegLens falls back to hashed embeddings + a NumPy vector store (fully offline).
+chromadb==1.5.9
+sentence-transformers==6.1.0

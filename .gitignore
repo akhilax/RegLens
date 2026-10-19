@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+.venv/
+venv/
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+
+# Build output
+dist/
+build/
+*.tsbuildinfo
+
+# Local data / secrets
+.env
+.env.local
+backend/data/*.db
+backend/data/*.db-*
+backend/data/chroma/
+backend/data/vectors/
+backend/data/uploads/
+
+# Playwright / QA
+frontend/qa/screenshots/
+frontend/qa/videos/
+frontend/test-results/
+frontend/playwright-report/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

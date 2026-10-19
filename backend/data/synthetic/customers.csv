@@ -1,0 +1,51 @@
+id,name,type,risk,is_pep,has_pan,pan,kyc_last_updated,country
+C001,Isha Rao,individual,medium,False,True,QUDHT7891Z,2026-01-04,IN
+C002,Riya Khan,individual,medium,False,True,JDOAV9032V,2026-07-24,IN
+C003,Aditya Verma,individual,medium,False,False,,2026-08-10,IN
+C004,Sunrise Traders Pvt Ltd,company,medium,False,True,UWWSJ1405W,2026-07-08,IN
+C005,Joseph Pillai,individual,low,False,True,DNQZY9045M,2026-01-06,IN
+C006,Kaveri Exports LLP,company,high,False,True,QQZAS4678Y,2026-01-16,IN
+C007,Joseph Reddy,individual,high,True,True,PEPHD8484V,2026-02-11,IN
+C008,Asha Seva Trust,npo,medium,False,True,WPZMN4318J,2026-01-05,IN
+C009,Riya Chatterjee,individual,medium,False,False,,2025-12-25,IN
+C010,Bluepeak Logistics,company,medium,False,True,OQYPZ8114R,2026-01-13,IN
+C011,Nikhil Reddy,individual,medium,False,True,WWZQI8420F,2026-02-06,IN
+C012,Zara Bose,individual,high,False,True,DGXNE8362A,2023-06-01,IN
+C013,Indus Agro Foods,company,medium,False,True,GHDTB9953I,2017-03-01,IN
+C014,Rohan D'Souza,individual,high,True,True,RHPSE9269J,2026-07-11,IN
+C015,Myra Reddy,individual,low,False,True,KSARK4234R,2026-02-17,IN
+C016,Diya Mehta,individual,medium,False,True,TUUJA7959S,2026-03-21,IN
+C017,Nimbus Software Pvt Ltd,company,medium,False,True,YEFRA9869V,2026-05-29,IN
+C018,Aarav Sharma,individual,low,False,True,PNIKE2465F,2025-12-15,IN
+C019,Pooja Sharma,individual,medium,False,True,PBHVQ3471X,2026-05-17,IN
+C020,Saffron Textiles,company,low,False,True,LLOUO9991Z,2026-06-08,IN
+C021,Vihaan D'Souza,individual,low,False,True,QWNZB3827C,2026-03-21,IN
+C022,Neel Reddy,individual,low,False,True,GWSJS1731M,2025-12-19,IN
+C023,Rohan Pillai,individual,low,False,True,BXSVZ4109F,2026-04-13,IN
+C024,Kiara Mehta,individual,low,False,True,XUATU8864N,2026-06-14,IN
+C025,Ananya Sharma,individual,low,False,True,VWUYA7136C,2025-12-29,IN
+C026,Vihaan Reddy,individual,low,False,True,DXCMI5939U,2026-01-13,IN
+C027,Gurpreet Bose,individual,low,False,True,YCZPY6112I,2026-08-14,IN
+C028,Tara Verma,individual,medium,False,True,KXVPM6139F,2026-04-02,IN
+C029,Vihaan Chatterjee,individual,medium,False,True,VXENI6389D,2025-12-02,IN
+C030,Vihaan Pillai,individual,medium,False,True,HKERY3019I,2026-05-04,IN
+C031,Pooja Kulkarni,individual,low,False,True,VYPVU9952Q,2026-08-01,IN
+C032,Monsoon Hospitality,company,low,False,True,AIRWI3139K,2026-06-22,IN
+C033,Vertex Pharma Distributors,company,low,False,True,VIKAY4427Z,2026-07-19,IN
+C034,Riya Bose,individual,low,False,True,WGRYA2566E,2025-12-08,IN
+C035,Coastal Seafoods,company,medium,False,True,CSNWQ3183D,2026-04-13,IN
+C036,Ananya Pillai,individual,medium,False,True,HPVVK6628L,2025-12-30,IN
+C037,Green Earth Foundation,npo,low,False,True,EAPZL5159Y,2026-01-11,IN
+C038,Himalaya Hardware Mart,company,low,False,True,XMJGS1887N,2025-12-30,IN
+C039,Sharma Enterprises,company,medium,False,True,TKPKV6564L,2025-12-25,IN
+C040,Om Patel,individual,medium,False,True,MUDTG1473O,2025-12-26,IN
+C041,Kiara Menon,individual,medium,False,True,GETRW3508X,2025-12-16,IN
+C042,Vidya Daan Society,npo,medium,False,True,IZJFE5383R,2026-09-01,IN
+C043,Neel Iyer,individual,low,False,True,NUTPR1475J,2026-07-02,IN
+C044,Nikhil Kulkarni,individual,low,False,True,EWQBP1123B,2026-04-05,IN
+C045,Fatima Khan,individual,low,False,True,GFHHV9102G,2026-02-09,IN
+C046,Sneha Kulkarni,individual,low,False,True,WGJUX8216R,2026-03-17,IN
+C047,Neel Nair,individual,low,False,True,GUNGN1499R,2026-06-22,IN
+C048,Sneha Bose,individual,low,False,True,PQOIL8998E,2026-09-14,IN
+C049,Om Patel,individual,medium,False,True,OOLRZ9608Q,2026-08-09,IN
+C050,Kabir Iyer,individual,low,False,True,OSDMZ8486T,2025-12-22,IN
