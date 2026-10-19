@@ -1,0 +1,179 @@
+# RegLens declarative rule set. Evaluated by a safe DSL interpreter (no eval).
+# All thresholds live in `params` and are linked to their regulatory source via `source_refs`.
+version: 1
+
+params:
+  ctr_cash_threshold: 1000000         # ₹10 lakh — PML Rules 3(1)(A)/(B)
+  cbwtr_threshold: 500000             # ₹5 lakh — PML Rules 3(1)(E)
+  npo_receipt_threshold: 1000000      # ₹10 lakh — PML Rules 3(1)(BA)
+  cash_receipt_limit: 200000          # ₹2 lakh — Income-tax cash receipt restriction
+  pan_cash_threshold: 50000           # ₹50,000 — PAN for cash deposits
+  lrs_limit_usd: 250000               # USD 2.5 lakh per FY — FEMA LRS
+  usd_inr_rate: 88.0                  # demo conversion rate
+  pep_edd_min_amount: 100000          # internal policy: EDD review for PEP txns ≥ ₹1 lakh
+  structuring_thresholds: [50000, 200000, 1000000]
+  structuring_band: [0.8, 1.0]        # 80%–100% of a threshold
+  structuring_min_count: 3
+  structuring_window_days: 7
+  kyc_periodicity_years: {high: 2, medium: 8, low: 10}
+
+lists:
+  high_risk_jurisdictions: "@high_risk_jurisdictions.yaml:call_for_action"
+  lrs_purpose_prefixes: ["S"]
+
+rules:
+  - id: R-CTR
+    name: Cash Transaction Report
+    description: Cash transaction above ₹10 lakh, or integrally connected cash transactions in a calendar month aggregating above ₹10 lakh.
+    severity: high
+    obligation: {type: CTR, reporting: true, description: File a Cash Transaction Report with FIU-IND.}
+    deadline_rule: 15th_of_next_month
+    source_refs: ["PML-RULES-2005#rule3-1-a", "PML-RULES-2005#rule3-1-b", "PML-RULES-2005#rule8-1"]
+    condition:
+      all:
+        - {field: channel, op: eq, value: cash}
+        - any:
+            - {field: amount_inr, op: gt, value: $params.ctr_cash_threshold}
+            - agg: sum
+              field: amount_inr
+              window: calendar_month
+              where: [{field: channel, op: eq, value: cash}]
+              op: gt
+              value: $params.ctr_cash_threshold
+
+  - id: R-STRUCT
+    name: Structuring (STR candidate)
+    description: Three or more cash transactions at 80–100% of a reporting/identification threshold within 7 days. A human must decide whether it is suspicious.
+    severity: critical
+    obligation: {type: STR, reporting: true, description: Principal Officer to determine suspicion; if confirmed file a Suspicious Transaction Report.}
+    deadline_rule: 7_working_days_after_determination
+    source_refs: ["PML-RULES-2005#rule2-1-g", "PML-RULES-2005#rule3-1-d", "PML-RULES-2005#rule8-2", "IT-CASH#pan-cash-50k"]
+    condition:
+      all:
+        - {field: channel, op: eq, value: cash}
+        - {field: amount_inr, op: near_any, value: $params.structuring_thresholds, band: $params.structuring_band}
+        - agg: count
+          window: {days: $params.structuring_window_days}
+          where:
+            - {field: channel, op: eq, value: cash}
+            - {field: amount_inr, op: near_any, value: $params.structuring_thresholds, band: $params.structuring_band}
+          op: gte
+          value: $params.structuring_min_count
+
+  - id: R-CBWTR
+    name: Cross-Border Wire Transfer Report
+    description: Cross-border wire transfer above ₹5 lakh where origin or destination is India.
+    severity: medium
+    obligation: {type: CBWTR, reporting: true, description: Include in the monthly Cross-Border Wire Transfer Report to FIU-IND.}
+    deadline_rule: 15th_of_next_month
+    source_refs: ["PML-RULES-2005#rule3-1-e", "PML-RULES-2005#rule8-1", "RBI-KYC-MD#sec64-wire"]
+    condition:
+      all:
+        - {field: channel, op: eq, value: SWIFT}
+        - {field: amount_inr, op: gt, value: $params.cbwtr_threshold}
+
+  - id: R-NPO
+    name: Non-Profit Organisation Transaction Report
+    description: Receipt by a non-profit organisation above ₹10 lakh.
+    severity: medium
+    obligation: {type: NTR, reporting: true, description: File a Non-Profit Organisation Transaction Report with FIU-IND.}
+    deadline_rule: 15th_of_next_month
+    source_refs: ["PML-RULES-2005#rule3-1-ba", "PML-RULES-2005#rule8-1"]
+    condition:
+      all:
+        - {field: customer.type, op: eq, value: npo}
+        - {field: direction, op: eq, value: credit}
+        - {field: amount_inr, op: gt, value: $params.npo_receipt_threshold}
+
+  - id: R-CASH-RECEIPT
+    name: Cash receipt ≥ ₹2 lakh from one person in a day
+    description: Business account receives cash aggregating ₹2 lakh or more from one person in a day.
+    severity: medium
+    obligation: {type: CASH_LIMIT_ALERT, reporting: false, description: Alert the account holder and review for a possible cash receipt restriction breach.}
+    deadline_rule: within_30_days
+    source_refs: ["IT-CASH#cash-receipt-2l"]
+    condition:
+      all:
+        - {field: customer.type, op: eq, value: company}
+        - {field: channel, op: eq, value: cash}
+        - {field: direction, op: eq, value: credit}
+        - {field: counterparty_id, op: exists}
+        - agg: sum
+          field: amount_inr
+          window: day
+          match: [counterparty_id]
+          where: [{field: channel, op: eq, value: cash}, {field: direction, op: eq, value: credit}]
+          op: gte
+          value: $params.cash_receipt_limit
+
+  - id: R-PAN
+    name: Cash deposit above ₹50,000 without PAN
+    description: Cash deposit above ₹50,000 by a customer without a PAN on record (Form 60 required).
+    severity: medium
+    obligation: {type: PAN_REQUIRED, reporting: false, description: Obtain PAN or Form 60 before accepting the deposit.}
+    deadline_rule: before_processing
+    source_refs: ["IT-CASH#pan-cash-50k", "RBI-KYC-MD#sec15-cdd"]
+    condition:
+      all:
+        - {field: channel, op: eq, value: cash}
+        - {field: direction, op: eq, value: credit}
+        - {field: customer.has_pan, op: is_false}
+        - agg: sum
+          field: amount_inr
+          window: day
+          where: [{field: channel, op: eq, value: cash}, {field: direction, op: eq, value: credit}]
+          op: gt
+          value: $params.pan_cash_threshold
+
+  - id: R-LRS
+    name: LRS annual limit breach
+    description: Resident individual's outward remittances in the financial year exceed USD 250,000.
+    severity: high
+    obligation: {type: LRS_LIMIT_BREACH, reporting: false, description: Hold the remittance; requires prior RBI approval beyond the LRS limit.}
+    deadline_rule: before_processing
+    source_refs: ["FEMA-LRS#lrs-limit", "FEMA-LRS#lrs-monitoring"]
+    condition:
+      all:
+        - {field: customer.type, op: eq, value: individual}
+        - {field: channel, op: eq, value: SWIFT}
+        - {field: direction, op: eq, value: debit}
+        - agg: sum
+          field: amount_usd
+          window: financial_year
+          where: [{field: channel, op: eq, value: SWIFT}, {field: direction, op: eq, value: debit}]
+          op: gt
+          value: $params.lrs_limit_usd
+
+  - id: R-HRJ
+    name: High-risk jurisdiction counterparty
+    description: Counterparty located in a FATF call-for-action jurisdiction.
+    severity: high
+    obligation: {type: EDD, reporting: false, description: Apply enhanced due diligence; examine background and purpose and consider an STR.}
+    deadline_rule: before_processing
+    source_refs: ["FATF-HRJ#call-for-action", "RBI-KYC-MD#sec55-fatf", "RBI-KYC-MD#sec39-edd"]
+    condition:
+      all:
+        - {field: counterparty_country, op: in, value: $lists.high_risk_jurisdictions}
+
+  - id: R-PEP
+    name: Politically exposed person
+    description: Transaction of ₹1 lakh or more by a politically exposed person.
+    severity: high
+    obligation: {type: EDD, reporting: false, description: Apply PEP enhanced due diligence and verify source of funds.}
+    deadline_rule: within_30_days
+    source_refs: ["RBI-KYC-MD#sec41-pep", "RBI-KYC-MD#sec39-edd"]
+    condition:
+      all:
+        - {field: customer.is_pep, op: is_true}
+        - {field: amount_inr, op: gte, value: $params.pep_edd_min_amount}
+
+  - id: R-KYC-DUE
+    name: Periodic KYC updation overdue
+    description: Customer's periodic KYC updation is overdue for their risk category (2/8/10 years).
+    severity: low
+    obligation: {type: KYC_UPDATE, reporting: false, description: Seek updated KYC documents from the customer.}
+    deadline_rule: within_30_days
+    source_refs: ["RBI-KYC-MD#sec38"]
+    condition:
+      all:
+        - {field: kyc_overdue_days, op: gt, value: 0}

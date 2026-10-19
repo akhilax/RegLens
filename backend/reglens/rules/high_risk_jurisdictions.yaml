@@ -1,0 +1,14 @@
+# Editable list of FATF high-risk jurisdictions used by rule R-HRJ (ISO 3166-1 alpha-2).
+# DEMO DATA — keep in sync with the latest FATF plenary statement: https://www.fatf-gafi.org/en/countries/black-and-grey-lists.html
+source_ref: FATF-HRJ#call-for-action
+updated: 2026-06-27
+call_for_action:
+  - KP  # Democratic People's Republic of Korea
+  - IR  # Iran
+  - MM  # Myanmar
+# Jurisdictions under increased monitoring are not auto-escalated; listed for reference only.
+increased_monitoring_reference:
+  - SY
+  - YE
+  - HT
+  - SS
