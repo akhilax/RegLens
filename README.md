@@ -90,6 +90,9 @@ npm run dev       # API on :8000 + web on :5173
 
 Open **http://localhost:5173** (API docs at http://localhost:8000/docs).
 
+**Windows shortcut:** double-click **`start-reglens.bat`**. On first run it installs dependencies and seeds
+demo data; every run starts the API + web app and opens your browser. Run `start-reglens.bat --reseed` for fresh demo data.
+
 | Command | What it does |
 |---|---|
 | `npm run setup -- --lite` | Skip the ML extras (uses built-in hashed embeddings + NumPy vector store) |
