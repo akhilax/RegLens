@@ -118,7 +118,7 @@ class MockLLMProvider:
             yield "I could not find a provision in the knowledge base that answers this question."
             return
         parts = [f"Here is what the knowledge base says about “{question.strip().rstrip('?')}”:\n\n"]
-        for c in chunks[:3]:
+        for c in chunks[:4]:
             sentences = re.split(r"(?<=[.;])\s+", c["text"].strip())
             excerpt = " ".join(sentences[:2])
             parts.append(f"• **{c['heading']}** — {excerpt} [{c['chunk_id']}]\n\n")

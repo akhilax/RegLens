@@ -54,6 +54,15 @@ class SentenceTransformerEmbedder:
     name = "all-MiniLM-L6-v2"
 
     def __init__(self) -> None:
+        import os
+        from pathlib import Path
+
+        # Use the local cache when present so startup works offline and skips Hub round-trips.
+        hub = Path(os.environ.get("HF_HOME", Path.home() / ".cache" / "huggingface")) / "hub"
+        if (hub / "models--sentence-transformers--all-MiniLM-L6-v2").exists():
+            os.environ.setdefault("HF_HUB_OFFLINE", "1")
+        for noisy in ("httpx", "huggingface_hub", "sentence_transformers"):
+            logging.getLogger(noisy).setLevel(logging.WARNING)
         from sentence_transformers import SentenceTransformer
 
         self.model = SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")

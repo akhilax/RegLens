@@ -37,8 +37,8 @@ Records of transactions referred to in Rule 3 must be maintained for a period of
 ## Rule 7 — Procedure for furnishing information {#rule7}
 The Designated Director and the Principal Officer of the reporting entity are responsible for furnishing information to the Director, FIU-IND. Information must be furnished in the prescribed electronic formats and the reporting entity must evolve an internal mechanism for detecting reportable transactions.
 
-## Rule 8(1) — Timeline for CTR, NTR and CBWTR {#rule8-1}
-Information in respect of transactions referred to in Rule 3(1)(A), (B), (BA) and (E) is to be furnished to the Director, FIU-IND, for every month by the fifteenth day of the succeeding month.
+## Rule 8(1) — When to file the CTR, NTR and CBWTR {#rule8-1}
+Information in respect of transactions referred to in Rule 3(1)(A), (B), (BA) and (E) — the Cash Transaction Report, Non-Profit Organisation Transaction Report and Cross-Border Wire Transfer Report — must be filed with (furnished to) the Director, FIU-IND, for every month by the fifteenth day of the succeeding month.
 
 ## Rule 8(2) — Timeline for STR {#rule8-2}
 Information in respect of suspicious transactions referred to in Rule 3(1)(D) is to be furnished promptly, and not later than five working days on being satisfied that the transaction is suspicious. The clock starts on the date of determination by the Principal Officer, not on the transaction date, and the determination itself must be recorded within thirty days of the alert being generated.
