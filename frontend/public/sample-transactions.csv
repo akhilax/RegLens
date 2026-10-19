@@ -1,0 +1,8 @@
+id,account_id,timestamp,amount_inr,currency,channel,direction,counterparty_id,counterparty_country,purpose_code
+,A0020,2026-10-16T10:15:00,1150000,INR,cash,credit,,IN,
+,A0021,2026-10-15T11:02:00,46000,INR,cash,credit,,IN,
+,A0021,2026-10-16T12:40:00,47500,INR,cash,credit,,IN,
+,A0021,2026-10-17T16:05:00,48800,INR,cash,credit,,IN,
+,A0022,2026-10-17T09:30:00,620000,INR,SWIFT,credit,,IR,P1301
+,A0023,2026-10-17T14:20:00,1850,INR,UPI,debit,,IN,
+,A0024,2026-10-18T10:00:00,72000,INR,NEFT,credit,,IN,

@@ -1,0 +1,193 @@
+[
+ {
+  "registry": "https://21st.dev/r/magicui/number-ticker",
+  "name": "number-ticker",
+  "title": "Number Ticker",
+  "author": "dillionverma",
+  "url": "https://21st.dev/@dillionverma/components/number-ticker",
+  "description": "Animate numbers to count up or down to a target number"
+ },
+ {
+  "registry": "https://21st.dev/r/magicui/border-beam",
+  "name": "border-beam",
+  "title": "Border Beam",
+  "author": "dillionverma",
+  "url": "https://21st.dev/@dillionverma/components/border-beam",
+  "description": "An animated beam of light which travels along the border of its container."
+ },
+ {
+  "registry": "https://21st.dev/r/aceternity/aurora-background",
+  "name": "aurora-background",
+  "title": "Aurora Background",
+  "author": "manuarora700",
+  "url": "https://21st.dev/@manuarora700/components/aurora-background",
+  "description": "A subtle Aurora or Southern Lights background for your website."
+ },
+ {
+  "registry": "https://21st.dev/r/magicui/animated-beam",
+  "name": "animated-beam",
+  "title": "Animated Beam",
+  "author": "dillionverma",
+  "url": "https://21st.dev/@dillionverma/components/animated-beam",
+  "description": "An animated beam of light which travels along a path. Useful for showcasing the \"integration\" features of a website."
+ },
+ {
+  "registry": "https://21st.dev/r/magicui/shimmer-button",
+  "name": "shimmer-button",
+  "title": "Shimmer Button",
+  "author": "dillionverma",
+  "url": "https://21st.dev/@dillionverma/components/shimmer-button",
+  "description": "A button with a shimmering light which travels around the perimeter."
+ },
+ {
+  "registry": "https://21st.dev/r/magicui/marquee",
+  "name": "marquee",
+  "title": "Marquee",
+  "author": "dillionverma",
+  "url": "https://21st.dev/@dillionverma/components/marquee",
+  "description": "An infinite scrolling component that can be used to display text, images, or videos.\n\nAdd the following animations to your tailwind.config.js file:\nextend: {\n      animation: {\n        marquee: \"marquee var(--duration) linear infinite\",\n        \"marquee-vertical\": \"marquee-vertical var(--duration) linear infinite\",\n      },\n      keyframes: {\n        marquee: {\n          from: { transform: \"translateX(0)\" },\n          to: { transform: \"translateX(calc(-100% - var(--gap)))\" },\n        },\n        \"marquee-vertical\": {\n          from: { transform: \"translateY(0)\" },\n          to: { transform: \"translateY(calc(-100% - var(--gap)))\" },\n        },\n      },\n    },"
+ },
+ {
+  "registry": "https://21st.dev/r/magicui/magic-card",
+  "name": "magic-card",
+  "title": "Magic Card",
+  "author": "dillionverma",
+  "url": "https://21st.dev/@dillionverma/components/magic-card",
+  "description": "A spotlight effect that follows your mouse cursor and highlights borders on hover."
+ },
+ {
+  "registry": "https://21st.dev/r/magicui/animated-list",
+  "name": "animated-list",
+  "title": "Animated List",
+  "author": "dillionverma",
+  "url": "https://21st.dev/@dillionverma/components/animated-list",
+  "description": "A list that animates each item in sequence with a delay. Used to showcase notifications or events on your landing page."
+ },
+ {
+  "registry": "https://21st.dev/r/magicui/bento-grid",
+  "name": "bento-grid",
+  "title": "Bento Grid",
+  "author": "dillionverma",
+  "url": "https://21st.dev/@dillionverma/components/bento-grid",
+  "description": "Bento grid is a layout used to showcase the features of a product in a simple and elegant way."
+ },
+ {
+  "registry": "https://21st.dev/r/magicui/dot-pattern",
+  "name": "dot-pattern",
+  "title": "Dot Pattern",
+  "author": "dillionverma",
+  "url": "https://21st.dev/@dillionverma/components/dot-pattern",
+  "description": "A background dot pattern made with SVGs, fully customizable using Tailwind CSS."
+ },
+ {
+  "registry": "https://21st.dev/r/aceternity/spotlight",
+  "name": "spotlight",
+  "title": "Spotlight",
+  "author": "manuarora700",
+  "url": "https://21st.dev/@manuarora700/components/spotlight",
+  "description": "A spotlight effect with Tailwind CSS, good for drawing attention to a particular element on the page."
+ },
+ {
+  "registry": "https://21st.dev/r/magicui/orbiting-circles",
+  "name": "orbiting-circles",
+  "title": "Orbiting Circles",
+  "author": "dillionverma",
+  "url": "https://21st.dev/@dillionverma/components/orbiting-circles",
+  "description": "A collection of circles which move in orbit along a circular path"
+ },
+ {
+  "registry": "https://21st.dev/r/magicui/ripple",
+  "name": "ripple",
+  "title": "Ripple",
+  "author": "dillionverma",
+  "url": "https://21st.dev/@dillionverma/components/ripple",
+  "description": "An animated ripple effect typically used behind elements to emphasize them.\n\nAdd the following animations to your tailwind.config.js file:\n    extend: {\n      animation: {\n        ripple: \"ripple var(--duration,2s) ease calc(var(--i, 0)*.2s) infinite\",\n      },\n      keyframes: {\n        ripple: {\n          \"0%, 100%\": {\n            transform: \"translate(-50%, -50%) scale(1)\",\n          },\n          \"50%\": {\n            transform: \"translate(-50%, -50%) scale(0.9)\",\n          },\n        },\n      },\n    },"
+ },
+ {
+  "registry": "https://21st.dev/r/magicui/animated-gradient-text",
+  "name": "animated-gradient-text",
+  "title": "Animated Gradient Text",
+  "author": "dillionverma",
+  "url": "https://21st.dev/@dillionverma/components/animated-gradient-text",
+  "description": "An animated gradient background which transitions between colors for text.\n\nAdd the following animations to your tailwind.config.js file:\n extend: {\n      animation: {\n        gradient: \"gradient 8s linear infinite\",\n      },\n      keyframes: {\n        gradient: {\n          to: {\n            backgroundPosition: \"var(--bg-size) 0\",\n          },\n        },\n      },"
+ },
+ {
+  "registry": "https://21st.dev/r/aceternity/text-generate-effect",
+  "name": "text-generate-effect",
+  "title": "Text Generate Effect",
+  "author": "manuarora700",
+  "url": "https://21st.dev/@manuarora700/components/text-generate-effect",
+  "description": "A cool text effect that fades in text on page load, one by one."
+ },
+ {
+  "registry": "https://21st.dev/r/magicui/blur-fade",
+  "name": "blur-fade",
+  "title": "Blur Fade",
+  "author": "dillionverma",
+  "url": "https://21st.dev/@dillionverma/components/blur-fade",
+  "description": "Blur fade in and out animation. Used to smoothly fade in and out content."
+ },
+ {
+  "registry": "https://21st.dev/r/magicui/animated-theme-toggler",
+  "missing": true,
+  "raw": "{\"error\":\"Authentication required\",\"reason\":\"authentication_required\"}"
+ },
+ {
+  "registry": "https://21st.dev/r/aceternity/animated-tooltip",
+  "name": "animated-tooltip",
+  "title": "Animated Tooltip",
+  "author": "manuarora700",
+  "url": "https://21st.dev/@manuarora700/components/animated-tooltip",
+  "description": "A cool tooltip that reveals on hover, follows mouse pointer\n\nFeatures:  \n-  Mouse Following: The tooltip moves and rotates with your cursor.  \n-  Spring Animation: Enjoy smooth, springy animations for a natural feel.  \n-  Hover Effects: Tooltips pop up with fade and scale effects when you hover.  \n-  Avatar Display: Circular profile pics with a stylish border.  \n-  Gradient Accents: Cool gradient lines add flair to the tooltip.  \n-  Group Layout: Stack avatars for a neat overlapping look.  \n-  Responsive Images: Next.js Image takes care of loading and optimizing images.  \n\nExample Use Cases:  \n-  Team Member Display: Show team info when you hover.  \n-  User Lists: Highlight user details in social features.  \n-  Contributor Sections: Feature project contributors.  \n-  Member Grids: Showcase community or organization members.  \n\nProps:  \n-  id: A unique identifier.  \n-  name: The display name.  \n-  designation: The role or title.  \n-  image: The avatar image URL.  "
+ },
+ {
+  "registry": "https://21st.dev/r/aceternity/expandable-card",
+  "missing": true,
+  "raw": "{\"error\":\"Component not found\"}"
+ },
+ {
+  "registry": "https://21st.dev/r/aceternity/timeline",
+  "name": "timeline",
+  "title": "Timeline",
+  "author": "manuarora700",
+  "url": "https://21st.dev/@manuarora700/components/timeline",
+  "description": "A timeline component with sticky header and scroll beam follow."
+ },
+ {
+  "registry": "https://21st.dev/r/aceternity/file-upload",
+  "name": "file-upload",
+  "title": "File Upload",
+  "author": "manuarora700",
+  "url": "https://21st.dev/@manuarora700/components/file-upload",
+  "description": "A minimal file upload form with background grid, drag and drop, and micro interactions."
+ },
+ {
+  "registry": "https://21st.dev/r/magicui/animated-circular-progress-bar",
+  "name": "animated-circular-progress-bar",
+  "title": "Animated Circular Progress Bar",
+  "author": "dillionverma",
+  "url": "https://21st.dev/@dillionverma/components/animated-circular-progress-bar",
+  "description": "Animated Circular Progress Bar is a component that displays a circular gauge with a percentage value."
+ },
+ {
+  "registry": "https://21st.dev/r/magicui/meteors",
+  "missing": true,
+  "raw": "{\"error\":\"Authentication required\",\"reason\":\"authentication_required\"}"
+ },
+ {
+  "registry": "https://21st.dev/r/magicui/particles",
+  "name": "particles",
+  "title": "Particles",
+  "author": "dillionverma",
+  "url": "https://21st.dev/@dillionverma/components/particles",
+  "description": "Particles are a fun way to add some visual flair to your website. They can be used to create a sense of depth, movement, and interactivity."
+ },
+ {
+  "registry": "https://21st.dev/r/magicui/word-rotate",
+  "name": "word-rotate",
+  "title": "Word Rotate",
+  "author": "dillionverma",
+  "url": "https://21st.dev/@dillionverma/components/word-rotate",
+  "description": "A vertical rotation of words."
+ }
+]

@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en" class="dark" style="color-scheme: dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0b0b14" />
+    <meta name="description" content="RegLens — traceable, RAG-powered transaction compliance with human approval." />
+    <title>RegLens · Compliance Console</title>
+    <script>
+      // Apply the saved theme before first paint (no flash). Storage can be unavailable; default to dark.
+      try {
+        var t = JSON.parse(localStorage.getItem("reglens-ui") || "{}").state?.theme;
+        if (t === "light") {
+          document.documentElement.classList.remove("dark");
+          document.documentElement.style.colorScheme = "light";
+        }
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
