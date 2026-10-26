@@ -8,7 +8,7 @@
 3. **Run Analysis** – **Analyse all transactions**, watch the live feed. Then **Download sample CSV** and drop it in → 3 new alerts.
 4. **Review Queue** – open **₹9,80,000 (T00012)** (red border).
    - **Hold to approve STR** → "1 of 2".
-   - Top right → switch to **Ravi Kulkarni** → open it again → hold → confetti.
+   - **Asha Menon** menu (top of the queue) → switch to **Ravi Kulkarni** → open it again → hold → confetti.
    - **DRAFT reports → STR · CSV**.
 5. **Full trace** (link in the card) – graph builds; click a clause; point at the red removed fake citation.
 6. **Close** – **Ctrl+K**, type `T00012`. *Say:* runs offline; one setting switches to Claude.

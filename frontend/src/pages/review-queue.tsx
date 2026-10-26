@@ -8,6 +8,7 @@ import { api, type DecisionSummary } from "@/api/client";
 import { useMeta, useQueue, useReports, useReviewAction } from "@/api/hooks";
 import { RiskBadge, RuleChip, StatusBadge } from "@/components/app/badges";
 import { HoldToApprove } from "@/components/app/hold-to-approve";
+import { ReviewerSwitcher } from "@/components/app/reviewer-switcher";
 import { RowsSkeleton } from "@/components/app/page-skeleton";
 import { EmptyState, ErrorState, PageHeader } from "@/components/app/states";
 import { Avatar } from "@/components/magic/animated-tooltip";
@@ -241,7 +242,7 @@ function DetailPanel({ d, onClose }: { d: DecisionSummary; onClose: () => void }
           )}
         </AnimatePresence>
         <div className="flex items-center justify-between border-t border-border pt-3 text-xs text-muted-foreground">
-          <span>Acting as <span className="font-medium text-foreground">{me?.name ?? reviewer}</span> · switch reviewer in the top bar</span>
+          <span>Acting as <span className="font-medium text-foreground">{me?.name ?? reviewer}</span> · switch reviewer at the top of the queue</span>
           <Link to={`/app/decisions/${d.id}`} className="flex items-center gap-1 text-brand hover:underline">
             Full trace <ArrowRight className="size-3" />
           </Link>
@@ -308,6 +309,7 @@ export default function ReviewQueue() {
             <span className="hidden items-center gap-1.5 text-xs text-muted-foreground lg:flex">
               <Kbd>J</Kbd><Kbd>K</Kbd> move · <Kbd>Enter</Kbd> open · <Kbd>A</Kbd> approve · <Kbd>R</Kbd> reject
             </span>
+            <ReviewerSwitcher />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline"><FileDown /> DRAFT reports</Button>
