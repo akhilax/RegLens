@@ -1,6 +1,6 @@
 /**
  * End-to-end demo flow (mutates data — run `npm run seed` afterwards for a fresh demo).
- * analysis (SSE) → four-eyes STR approval → decision trace → command palette.
+ * analysis (SSE) → reasons in review card → four-eyes STR approval → command palette.
  */
 import { expect, test } from "@playwright/test";
 
@@ -15,7 +15,7 @@ test("full demo flow works with zero console errors", async ({ page }) => {
   await page.goto("/app/analysis");
   await page.getByRole("button", { name: /Analyse all transactions/ }).click();
   await expect(page.getByText("100%", { exact: true })).toBeVisible({ timeout: 120_000 });
-  await expect(page.locator("main a[href^='/app/decisions/']").first()).toBeVisible();
+  await expect(page.locator("main a[href^='/app/review?open=']").first()).toBeVisible();
   await page.screenshot({ path: "qa/screenshots/flow-1-analysis.png" });
 
   // 2. Four-eyes STR approval: Asha holds to approve, then Ravi completes it
@@ -24,6 +24,8 @@ test("full demo flow works with zero console errors", async ({ page }) => {
   const decisionNo = label!.match(/Decision (\d+)/)![1];
   const strCard = page.locator(`[aria-label^="Decision ${decisionNo} for"]`);
   await strCard.click();
+  await expect(page.getByText("Why it was flagged")).toBeVisible();
+  await expect(page.getByText(/just under a reporting limit/)).toBeVisible();
   const hold = page.getByRole("button", { name: /Hold to approve STR/ });
   await expect(hold).toBeVisible();
   await page.screenshot({ path: "qa/screenshots/flow-2-str-panel.png" });
@@ -46,12 +48,7 @@ test("full demo flow works with zero console errors", async ({ page }) => {
   await page.screenshot({ path: "qa/screenshots/flow-3-str-approved.png" });
   await page.keyboard.press("Escape");
 
-  // 3. Decision trace
-  await page.goto(`/app/decisions/${decisionNo}`);
-  await expect(page.getByText(/Guardrail: 1 stripped/)).toBeVisible({ timeout: 15_000 });
-  await page.screenshot({ path: "qa/screenshots/flow-4-trace.png" });
-
-  // 4. Command palette
+  // 3. Command palette
   await page.keyboard.press("Control+k");
   await page.getByPlaceholder(/Type a page/).fill("T00042");
   await expect(page.getByRole("option", { name: /T00042/ }).first()).toBeVisible();

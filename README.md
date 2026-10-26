@@ -19,8 +19,7 @@
 | Dashboard | Totals, risk pulse, upcoming filing deadlines |
 | Transactions | Browse and filter all 600 transactions |
 | Run Analysis | Re-check all transactions live, or upload your own CSV |
-| Review Queue | Approve / reject cases (STR needs two people), download draft reports |
-| Decision Trace | See exactly why a case was flagged: rules, clauses, AI output |
+| Review Queue | See why each case was flagged, approve / reject (STR needs two people), download draft reports |
 
 ## Run it
 Needs **Node.js 20+** and **Python 3.11+**.

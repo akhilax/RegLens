@@ -241,10 +241,10 @@ export default function Transactions() {
                   {focused.risk_level && <RiskBadge level={focused.risk_level} />}
                   {focused.decision_status && <StatusBadge status={focused.decision_status} />}
                 </div>
-                {focused.decision_id && (
+                {focused.decision_id && focused.decision_status !== "auto_cleared" && focused.decision_status !== "logged" && (
                   <Button asChild className="w-full">
-                    <Link to={`/app/decisions/${focused.decision_id}`}>
-                      Open decision trace <ExternalLink />
+                    <Link to={`/app/review?open=${focused.decision_id}`}>
+                      Open in review queue <ExternalLink />
                     </Link>
                   </Button>
                 )}

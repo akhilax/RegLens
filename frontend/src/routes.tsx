@@ -8,7 +8,6 @@ const Dashboard = lazy(() => import("@/pages/dashboard"));
 const Transactions = lazy(() => import("@/pages/transactions"));
 const RunAnalysis = lazy(() => import("@/pages/run-analysis"));
 const ReviewQueue = lazy(() => import("@/pages/review-queue"));
-const DecisionTrace = lazy(() => import("@/pages/decision-trace"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 
 export const router = createBrowserRouter([
@@ -21,7 +20,6 @@ export const router = createBrowserRouter([
       { path: "transactions", element: <Transactions /> },
       { path: "analysis", element: <RunAnalysis /> },
       { path: "review", element: <ReviewQueue /> },
-      { path: "decisions/:id", element: <DecisionTrace /> },
       { path: "*", element: <NotFound /> },
     ],
   },

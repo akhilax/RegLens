@@ -198,7 +198,7 @@ export default function RunAnalysis() {
                   items={feed.map((e) => ({
                     key: `${e.decision_id}`,
                     node: (
-                      <Link to={`/app/decisions/${e.decision_id}`} className="flex items-center gap-3 rounded-xl border border-border bg-card/70 p-3 transition-colors hover:border-border-strong hover:bg-accent/30">
+                      <Link to={`/app/review?open=${e.decision_id}`} className="flex items-center gap-3 rounded-xl border border-border bg-card/70 p-3 transition-colors hover:border-border-strong hover:bg-accent/30">
                         <div className={cn("grid size-9 shrink-0 place-items-center rounded-lg", e.risk_level === "high" ? "bg-risk-high-bg" : e.risk_level === "medium" ? "bg-risk-medium-bg" : "bg-risk-low-bg")}>
                           <Zap className={cn("size-4", e.risk_level === "high" ? "text-risk-high" : e.risk_level === "medium" ? "text-risk-medium" : "text-risk-low")} />
                         </div>

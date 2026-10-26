@@ -62,8 +62,6 @@ export const api = {
     request<TxnPage>(`/transactions${qs(params)}`),
   decisions: (params: Record<string, string | number | boolean | undefined> = {}) =>
     request<DecisionSummary[]>(`/decisions${qs(params)}`),
-  decision: (id: number) => request<DecisionDetail>(`/decisions/${id}`),
-  reanalyze: (txnId: string) => request<DecisionDetail>(`/transactions/${txnId}/analyze`, { method: "POST" }),
   queue: (includeClosed = true) => request<DecisionSummary[]>(`/review/queue${qs({ include_closed: includeClosed })}`),
   reviewers: () => request<Reviewer[]>("/review/reviewers"),
   review: (id: number, body: ReviewIn) =>

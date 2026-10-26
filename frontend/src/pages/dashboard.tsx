@@ -166,7 +166,7 @@ export default function Dashboard() {
                     key: `${d.decision_id}-${d.type}`,
                     tone,
                     content: (
-                      <Link to={`/app/decisions/${d.decision_id}`} className="group flex items-center gap-3 rounded-lg py-0.5">
+                      <Link to={`/app/review?open=${d.decision_id}`} className="group flex items-center gap-3 rounded-lg py-0.5">
                         <span className="w-14 shrink-0 font-mono text-xs font-semibold">{d.type}</span>
                         <span className="min-w-0 flex-1 truncate text-xs text-muted-foreground group-hover:text-foreground">
                           {d.transaction_id} · due {formatDate(d.deadline, { day: "2-digit", month: "short" })}

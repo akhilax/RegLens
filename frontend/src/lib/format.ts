@@ -71,3 +71,30 @@ export const RULE_LABEL: Record<string, string> = {
   "R-PEP": "PEP",
   "R-KYC-DUE": "KYC overdue",
 };
+
+/** Plain-language reason shown to reviewers for each rule. */
+export const RULE_REASON: Record<string, string> = {
+  "R-CTR": "Large cash amount – over ₹10 lakh at once or within a month.",
+  "R-STRUCT": "Several cash deposits just under a reporting limit – could be an attempt to avoid checks.",
+  "R-CBWTR": "Large transfer to or from another country (over ₹5 lakh).",
+  "R-NPO": "A charity received more than ₹10 lakh.",
+  "R-CASH-RECEIPT": "A business took ₹2 lakh or more in cash from one person in a day.",
+  "R-PAN": "Over ₹50,000 cash deposited without a PAN on record.",
+  "R-LRS": "This person has sent more abroad this year than the allowed limit.",
+  "R-HRJ": "Money linked to a high-risk country.",
+  "R-PEP": "The customer is a politically exposed person (e.g. a politician).",
+  "R-KYC-DUE": "The customer's ID documents are out of date.",
+};
+
+/** Plain-language next step for each obligation type. */
+export const OBLIGATION_LABEL: Record<string, string> = {
+  CTR: "File a cash report",
+  STR: "File a suspicious activity report",
+  CBWTR: "File a foreign transfer report",
+  NTR: "File a charity report",
+  EDD: "Do extra checks on the customer",
+  PAN_REQUIRED: "Collect the customer's PAN",
+  KYC_UPDATE: "Get updated ID from the customer",
+  LRS_LIMIT_BREACH: "Hold the transfer",
+  CASH_LIMIT_ALERT: "Warn the business",
+};

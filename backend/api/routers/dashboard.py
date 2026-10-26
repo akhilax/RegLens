@@ -111,8 +111,8 @@ def search(q: str = Query(min_length=1, max_length=64), db: Session = Depends(ge
         if d:
             hits.append(schemas.SearchHit(kind="decision", id=str(d.id), title=f"Decision #{d.id}",
                                           subtitle=f"{d.transaction_id} · {d.status} · {d.risk_level}",
-                                          href=f"/app/decisions/{d.id}"))
+                                          href=f"/app/review?open={d.id}"))
     for d in db.scalars(select(Decision).where(Decision.is_current, Decision.transaction_id.ilike(like)).limit(4)).all():
         hits.append(schemas.SearchHit(kind="decision", id=str(d.id), title=f"Decision #{d.id} ({d.transaction_id})",
-                                      subtitle=f"{d.status} · {d.risk_level} risk", href=f"/app/decisions/{d.id}"))
+                                      subtitle=f"{d.status} · {d.risk_level} risk", href=f"/app/review?open={d.id}"))
     return hits

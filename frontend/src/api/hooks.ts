@@ -17,8 +17,6 @@ export const qk = {
 export const useStats = () => useQuery({ queryKey: qk.stats, queryFn: api.stats, refetchInterval: 15_000 });
 export const useMeta = () => useQuery({ queryKey: qk.meta, queryFn: api.meta, staleTime: Infinity });
 export const useQueue = () => useQuery({ queryKey: qk.queue, queryFn: () => api.queue(true) });
-export const useDecision = (id: number) =>
-  useQuery({ queryKey: qk.decision(id), queryFn: () => api.decision(id), enabled: Number.isFinite(id) });
 export const useTransactions = (params: Record<string, string | number | boolean | undefined>) =>
   useQuery({ queryKey: qk.transactions(params), queryFn: () => api.transactions(params), placeholderData: keepPreviousData });
 export const useReports = () => useQuery({ queryKey: qk.reports, queryFn: api.reports });
@@ -43,7 +41,6 @@ export function useReviewAction() {
       toast.error("Review action failed", { description: err instanceof Error ? err.message : String(err) });
     },
     onSuccess: (d: DecisionDetail) => {
-      qc.setQueryData(qk.decision(d.id), d);
       qc.setQueryData<DecisionSummary[]>(qk.queue, (prev) =>
         prev?.map((x) => (x.id === d.id ? { ...x, ...d } : x)),
       );

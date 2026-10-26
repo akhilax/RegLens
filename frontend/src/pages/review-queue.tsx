@@ -1,8 +1,8 @@
 import confetti from "canvas-confetti";
 import { AnimatePresence, LayoutGroup, m } from "motion/react";
-import { ArrowRight, Check, Download, FileDown, ShieldAlert, Users, X } from "lucide-react";
+import { AlertTriangle, Check, Download, FileDown, ShieldAlert, Users, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Link } from "react-router";
+import { Link, useSearchParams } from "react-router";
 import { toast } from "sonner";
 import { api, type DecisionSummary } from "@/api/client";
 import { useMeta, useQueue, useReports, useReviewAction } from "@/api/hooks";
@@ -22,7 +22,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/overlay";
 import { Kbd, Textarea } from "@/components/ui/primitives";
-import { countdownLabel, formatDate, formatINR } from "@/lib/format";
+import { countdownLabel, formatDate, formatINR, OBLIGATION_LABEL, RULE_REASON } from "@/lib/format";
 import { spring } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 import { useUI } from "@/store/ui";
@@ -95,6 +95,13 @@ function DetailPanel({ d, onClose }: { d: DecisionSummary; onClose: () => void }
     : reviewer;
   const me = meta?.reviewers.find((r) => r.id === actorId);
   const closed = d.status === "approved" || d.status === "rejected";
+  const nextSteps = Object.values(
+    d.obligations.reduce<Record<string, (typeof d.obligations)[number]>>((acc, o) => {
+      const prev = acc[o.type];
+      if (!prev || (o.deadline && (!prev.deadline || o.deadline < prev.deadline))) acc[o.type] = o;
+      return acc;
+    }, {}),
+  );
   const alreadyApproved = d.approvals.includes(actorId);
 
   const run = (action: "approve" | "reject", extra: { comment?: string; modifications?: Record<string, unknown> } = {}) =>
@@ -139,29 +146,39 @@ function DetailPanel({ d, onClose }: { d: DecisionSummary; onClose: () => void }
           <span className="font-mono text-3xl font-semibold tracking-tight">{formatINR(d.amount_inr)}</span>
           <span className="text-sm text-muted-foreground">{d.channel} {d.direction} · {d.customer_name} ({d.customer_type}) · {formatDate(d.timestamp)}</span>
         </div>
-        <p className="text-sm text-muted-foreground">{d.summary}</p>
-        <div className="flex flex-wrap gap-1.5">{d.rules.map((r) => <RuleChip key={r} id={r} />)}</div>
-
-        <div className="grid gap-2 sm:grid-cols-2">
-          {d.obligations.map((o) => (
-            <div key={o.type + o.source_rule_id} className="rounded-xl border border-border bg-background/40 p-3">
-              <div className="flex items-center justify-between">
-                <span className="font-mono text-sm font-semibold">{o.type}</span>
-                {o.deadline ? (
-                  <span className="rounded-full bg-accent px-2 py-0.5 font-mono text-[10.5px] text-accent-foreground">{countdownLabel(o.deadline)}</span>
-                ) : (
-                  <span className="text-[10.5px] text-muted-foreground">on determination</span>
-                )}
-              </div>
-              <p className="mt-1 text-xs text-muted-foreground">{o.description}</p>
-            </div>
-          ))}
+        <div>
+          <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Why it was flagged</h3>
+          <ul className="space-y-1.5">
+            {d.rules.map((r) => (
+              <li key={r} className="flex items-start gap-2 text-sm">
+                <AlertTriangle className="mt-0.5 size-4 shrink-0 text-risk-medium" aria-hidden />
+                {RULE_REASON[r] ?? r}
+              </li>
+            ))}
+            {d.citation_issue && (
+              <li className="flex items-start gap-2 text-sm">
+                <ShieldAlert className="mt-0.5 size-4 shrink-0 text-risk-high" aria-hidden />
+                The AI quoted a rule it couldn’t back up, so it was removed and a person must check.
+              </li>
+            )}
+          </ul>
         </div>
 
-        {d.routing_reasons.length > 0 && (
-          <div className="flex flex-wrap items-center gap-1.5 text-[11px] text-muted-foreground">
-            Routed because:
-            {d.routing_reasons.map((r) => <span key={r} className="rounded-md border border-border px-1.5 py-0.5 font-mono">{r}</span>)}
+        {nextSteps.length > 0 && (
+          <div>
+            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">What needs to happen</h3>
+            <ul className="space-y-1.5">
+              {nextSteps.map((o) => (
+                <li key={o.type} className="flex items-center justify-between gap-3 rounded-lg border border-border bg-background/40 px-3 py-2 text-sm">
+                  <span>{OBLIGATION_LABEL[o.type] ?? o.type}</span>
+                  {o.deadline ? (
+                    <span className="shrink-0 rounded-full bg-accent px-2 py-0.5 font-mono text-[10.5px] text-accent-foreground">{countdownLabel(o.deadline)}</span>
+                  ) : (
+                    <span className="shrink-0 text-[10.5px] text-muted-foreground">after approval</span>
+                  )}
+                </li>
+              ))}
+            </ul>
           </div>
         )}
 
@@ -223,9 +240,6 @@ function DetailPanel({ d, onClose }: { d: DecisionSummary; onClose: () => void }
         </AnimatePresence>
         <div className="flex items-center justify-between border-t border-border pt-3 text-xs text-muted-foreground">
           <span>{d.approvals.length ? "Second approver" : "Approving as"} <span className="font-medium text-foreground">{me?.name ?? actorId}</span>{me ? ` · ${me.role}` : ""}</span>
-          <Link to={`/app/decisions/${d.id}`} className="flex items-center gap-1 text-brand hover:underline">
-            Full trace <ArrowRight className="size-3" />
-          </Link>
         </div>
       </m.div>
     </m.div>
@@ -237,7 +251,8 @@ export default function ReviewQueue() {
   const { data: reports } = useReports();
   const mutation = useReviewAction();
   const reviewer = useUI((s) => s.reviewer);
-  const [openId, setOpenId] = useState<number | null>(null);
+  const [params] = useSearchParams();
+  const [openId, setOpenId] = useState<number | null>(() => Number(params.get("open")) || null);
   const [cursor, setCursor] = useState(0);
 
   const columns = useMemo(
