@@ -8,7 +8,6 @@ import { api, type DecisionSummary } from "@/api/client";
 import { useMeta, useQueue, useReports, useReviewAction } from "@/api/hooks";
 import { RiskBadge, RuleChip, StatusBadge } from "@/components/app/badges";
 import { HoldToApprove } from "@/components/app/hold-to-approve";
-import { ReviewerSwitcher } from "@/components/app/reviewer-switcher";
 import { RowsSkeleton } from "@/components/app/page-skeleton";
 import { EmptyState, ErrorState, PageHeader } from "@/components/app/states";
 import { Avatar } from "@/components/magic/animated-tooltip";
@@ -90,13 +89,17 @@ function DetailPanel({ d, onClose }: { d: DecisionSummary; onClose: () => void }
   const [mode, setMode] = useState<"none" | "reject">("none");
   const [comment, setComment] = useState("");
   const [justApproved, setJustApproved] = useState(false);
-  const me = meta?.reviewers.find((r) => r.id === reviewer);
+  // Four-eyes: once someone has approved, the next approval is made by a different reviewer.
+  const actorId = d.approvals.includes(reviewer)
+    ? (meta?.reviewers.find((r) => !d.approvals.includes(r.id))?.id ?? reviewer)
+    : reviewer;
+  const me = meta?.reviewers.find((r) => r.id === actorId);
   const closed = d.status === "approved" || d.status === "rejected";
-  const alreadyApproved = d.approvals.includes(reviewer);
+  const alreadyApproved = d.approvals.includes(actorId);
 
   const run = (action: "approve" | "reject", extra: { comment?: string; modifications?: Record<string, unknown> } = {}) =>
     mutation.mutate(
-      { id: d.id, body: { reviewer, action, comment: extra.comment ?? null, modifications: extra.modifications ?? null } },
+      { id: d.id, body: { reviewer: actorId, action, comment: extra.comment ?? null, modifications: extra.modifications ?? null } },
       {
         onSuccess: (res) => {
           setMode("none");
@@ -219,7 +222,7 @@ function DetailPanel({ d, onClose }: { d: DecisionSummary; onClose: () => void }
           )}
         </AnimatePresence>
         <div className="flex items-center justify-between border-t border-border pt-3 text-xs text-muted-foreground">
-          <span>Acting as <span className="font-medium text-foreground">{me?.name ?? reviewer}</span> · switch reviewer at the top of the queue</span>
+          <span>{d.approvals.length ? "Second approver" : "Approving as"} <span className="font-medium text-foreground">{me?.name ?? actorId}</span>{me ? ` · ${me.role}` : ""}</span>
           <Link to={`/app/decisions/${d.id}`} className="flex items-center gap-1 text-brand hover:underline">
             Full trace <ArrowRight className="size-3" />
           </Link>
@@ -286,7 +289,6 @@ export default function ReviewQueue() {
             <span className="hidden items-center gap-1.5 text-xs text-muted-foreground lg:flex">
               <Kbd>J</Kbd><Kbd>K</Kbd> move · <Kbd>Enter</Kbd> open · <Kbd>A</Kbd> approve · <Kbd>R</Kbd> reject
             </span>
-            <ReviewerSwitcher />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline"><FileDown /> DRAFT reports</Button>

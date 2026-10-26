@@ -10,7 +10,6 @@ interface UIState {
   paletteOpen: boolean;
   setTheme: (t: Theme) => void;
   toggleSidebar: () => void;
-  setReviewer: (id: string) => void;
   setPaletteOpen: (open: boolean) => void;
 }
 
@@ -49,13 +48,17 @@ export const useUI = create<UIState>()(
       paletteOpen: false,
       setTheme: (theme) => set({ theme }),
       toggleSidebar: () => set((s) => ({ sidebarCollapsed: !s.sidebarCollapsed })),
-      setReviewer: (reviewer) => set({ reviewer }),
       setPaletteOpen: (paletteOpen) => set({ paletteOpen }),
     }),
     {
       name: "reglens-ui",
       storage: createJSONStorage(() => safeStorage),
-      partialize: (s) => ({ theme: s.theme, sidebarCollapsed: s.sidebarCollapsed, reviewer: s.reviewer }),
+      partialize: (s) => ({ theme: s.theme, sidebarCollapsed: s.sidebarCollapsed }),
+      // Only restore view preferences (ignores any reviewer saved by older versions).
+      merge: (saved, current) => {
+        const p = (saved ?? {}) as Partial<UIState>;
+        return { ...current, theme: p.theme ?? current.theme, sidebarCollapsed: p.sidebarCollapsed ?? current.sidebarCollapsed };
+      },
     },
   ),
 );

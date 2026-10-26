@@ -35,8 +35,6 @@ test("full demo flow works with zero console errors", async ({ page }) => {
   await expect(page.getByText(/1 of 2 approvals/)).toBeVisible();
   await page.keyboard.press("Escape");
 
-  await page.getByRole("button", { name: "Switch reviewer" }).click();
-  await page.getByRole("menuitem", { name: /Ravi Kulkarni/ }).click();
   await strCard.click();
   const second = page.getByRole("button", { name: /Hold for 2nd approval/ });
   await second.hover();
