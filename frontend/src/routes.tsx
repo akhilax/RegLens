@@ -9,10 +9,6 @@ const Transactions = lazy(() => import("@/pages/transactions"));
 const RunAnalysis = lazy(() => import("@/pages/run-analysis"));
 const ReviewQueue = lazy(() => import("@/pages/review-queue"));
 const DecisionTrace = lazy(() => import("@/pages/decision-trace"));
-const KnowledgeBase = lazy(() => import("@/pages/knowledge-base"));
-const Ask = lazy(() => import("@/pages/ask"));
-const AuditLog = lazy(() => import("@/pages/audit-log"));
-const Evaluation = lazy(() => import("@/pages/evaluation"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 
 export const router = createBrowserRouter([
@@ -26,10 +22,6 @@ export const router = createBrowserRouter([
       { path: "analysis", element: <RunAnalysis /> },
       { path: "review", element: <ReviewQueue /> },
       { path: "decisions/:id", element: <DecisionTrace /> },
-      { path: "knowledge", element: <KnowledgeBase /> },
-      { path: "ask", element: <Ask /> },
-      { path: "audit", element: <AuditLog /> },
-      { path: "evaluation", element: <Evaluation /> },
       { path: "*", element: <NotFound /> },
     ],
   },

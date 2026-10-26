@@ -1,11 +1,9 @@
-"""LLM provider abstraction: Mock (offline, deterministic), Claude (Anthropic SDK), Ollama (local HTTP)."""
+"""LLM provider abstraction: Mock (offline, deterministic) or Claude (Anthropic SDK)."""
 
 from __future__ import annotations
 
 import hashlib
 import json
-import re
-from collections.abc import Iterator
 from dataclasses import dataclass, field
 from functools import lru_cache
 from typing import Any, Protocol
@@ -31,8 +29,6 @@ class LLMProvider(Protocol):
 
     def complete(self, req: LLMRequest) -> str: ...
 
-    def stream(self, req: LLMRequest) -> Iterator[str]: ...
-
 
 def _stable_int(text: str) -> int:
     return int(hashlib.sha256(text.encode()).hexdigest()[:8], 16)
@@ -51,8 +47,6 @@ class MockLLMProvider:
 
     def complete(self, req: LLMRequest) -> str:
         ctx = req.context
-        if ctx.get("task") == "qa":
-            return "".join(self.stream(req))
         txn_id: str = ctx.get("txn_id", "")
         h = _stable_int(txn_id)
         if req.attempt == 1 and h % 40 == 3:
@@ -111,20 +105,6 @@ class MockLLMProvider:
                "confidence": round(confidence, 2), "summary": summary}
         return json.dumps(out)
 
-    def stream(self, req: LLMRequest) -> Iterator[str]:
-        chunks: list[dict[str, Any]] = req.context.get("chunks", [])
-        question: str = req.context.get("question", "")
-        if not chunks:
-            yield "I could not find a provision in the knowledge base that answers this question."
-            return
-        parts = [f"Here is what the knowledge base says about “{question.strip().rstrip('?')}”:\n\n"]
-        for c in chunks[:4]:
-            sentences = re.split(r"(?<=[.;])\s+", c["text"].strip())
-            excerpt = " ".join(sentences[:2])
-            parts.append(f"• **{c['heading']}** — {excerpt} [{c['chunk_id']}]\n\n")
-        parts.append("_Educational summary — verify against the official source before acting._")
-        yield from re.findall(r"\S+\s*", "".join(parts))
-
 
 class ClaudeProvider:
     name = "claude"
@@ -152,54 +132,10 @@ class ClaudeProvider:
                                            messages=self._messages(req))
         return "".join(getattr(b, "text", "") for b in resp.content)
 
-    def stream(self, req: LLMRequest) -> Iterator[str]:
-        with self.client.messages.stream(model=self.model, max_tokens=1200, system=req.system,
-                                         messages=self._messages(req)) as stream:
-            yield from stream.text_stream
-
-
-class OllamaProvider:
-    name = "ollama"
-
-    def __init__(self) -> None:
-        s = get_settings()
-        self.url = s.ollama_url.rstrip("/")
-        self.model = s.ollama_model
-
-    def _payload(self, req: LLMRequest, stream: bool, json_mode: bool) -> dict[str, Any]:
-        user = req.user
-        if req.previous_error:
-            from reglens.llm.prompts import REPAIR_USER
-
-            user += "\n\n" + REPAIR_USER.format(error=req.previous_error)
-        body: dict[str, Any] = {"model": self.model, "stream": stream,
-                                "messages": [{"role": "system", "content": req.system},
-                                             {"role": "user", "content": user}]}
-        if json_mode:
-            body["format"] = "json"
-        return body
-
-    def complete(self, req: LLMRequest) -> str:
-        import httpx
-
-        r = httpx.post(f"{self.url}/api/chat", json=self._payload(req, False, True), timeout=120)
-        r.raise_for_status()
-        return r.json()["message"]["content"]
-
-    def stream(self, req: LLMRequest) -> Iterator[str]:
-        import httpx
-
-        with httpx.stream("POST", f"{self.url}/api/chat", json=self._payload(req, True, False), timeout=120) as r:
-            for line in r.iter_lines():
-                if line:
-                    yield json.loads(line).get("message", {}).get("content", "")
-
 
 @lru_cache
 def get_provider(name: str | None = None) -> LLMProvider:
     choice = (name or get_settings().llm_provider).lower()
     if choice == "claude":
         return ClaudeProvider()
-    if choice == "ollama":
-        return OllamaProvider()
     return MockLLMProvider()

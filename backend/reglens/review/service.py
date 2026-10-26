@@ -8,7 +8,6 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
-from reglens.audit.chain import append as audit
 from reglens.core.models import Decision, ReviewAction
 from reglens.core.utils import add_working_days
 
@@ -18,10 +17,9 @@ REVIEWERS: list[dict[str, str]] = [
     {"id": "meera", "name": "Meera Iyer", "role": "Compliance Manager"},
 ]
 REVIEWER_IDS = {r["id"] for r in REVIEWERS}
-QUEUE_STATES = ("pending_review", "in_review", "awaiting_second_approval", "needs_re_review")
+QUEUE_STATES = ("pending_review", "in_review", "awaiting_second_approval")
 CLOSED_STATES = ("approved", "rejected")
 RISK_ORDER = {"high": 0, "medium": 1, "low": 2}
-SEPARATOR = "round_reset"
 
 
 class ReviewError(Exception):
@@ -46,13 +44,7 @@ def queue(session: Session, include_closed: bool = False) -> list[Decision]:
 
 
 def current_round_approvals(d: Decision) -> list[ReviewAction]:
-    approvals: list[ReviewAction] = []
-    for r in d.reviews:
-        if r.action == SEPARATOR:
-            approvals = []
-        elif r.action in ("approve", "modify"):
-            approvals.append(r)
-    return approvals
+    return [r for r in d.reviews if r.action in ("approve", "modify")]
 
 
 def act(session: Session, decision_id: int, reviewer: str, action: str, comment: str | None = None,
@@ -71,7 +63,6 @@ def act(session: Session, decision_id: int, reviewer: str, action: str, comment:
     if action in ("reject", "modify") and not (comment and comment.strip()):
         raise ReviewError(422, "A comment is required to reject or modify a decision")
 
-    before = d.status
     today = today or date.today()
 
     if action == "start_review":
@@ -107,19 +98,5 @@ def act(session: Session, decision_id: int, reviewer: str, action: str, comment:
                           modifications=modifications)
     session.add(review)
     session.flush()
-    audit(session, f"REVIEW_{action.upper()}", "decision", d.id, reviewer, {
-        "transaction_id": d.transaction_id, "from": before, "to": d.status, "comment": comment,
-        "modifications": modifications, "four_eyes": d.requires_four_eyes,
-    })
-    session.flush()
     session.refresh(d)
     return d
-
-
-def mark_for_re_review(session: Session, d: Decision, reason: str, actor: str = "system") -> None:
-    before = d.status
-    d.status = "needs_re_review"
-    d.re_review_reason = reason
-    session.add(ReviewAction(decision_id=d.id, reviewer=actor, action=SEPARATOR, comment=reason))
-    audit(session, "DECISION_NEEDS_RE_REVIEW", "decision", d.id, actor,
-          {"transaction_id": d.transaction_id, "from": before, "reason": reason})

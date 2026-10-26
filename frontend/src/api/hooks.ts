@@ -10,10 +10,6 @@ export const qk = {
   decision: (id: number) => ["decision", id] as const,
   decisions: ["decisions"] as const,
   transactions: (p: object) => ["transactions", p] as const,
-  documents: ["documents"] as const,
-  document: (id: string, v?: number) => ["document", id, v] as const,
-  audit: ["audit"] as const,
-  eval: ["eval"] as const,
   reports: ["reports"] as const,
   runs: ["runs"] as const,
 };
@@ -25,11 +21,6 @@ export const useDecision = (id: number) =>
   useQuery({ queryKey: qk.decision(id), queryFn: () => api.decision(id), enabled: Number.isFinite(id) });
 export const useTransactions = (params: Record<string, string | number | boolean | undefined>) =>
   useQuery({ queryKey: qk.transactions(params), queryFn: () => api.transactions(params), placeholderData: keepPreviousData });
-export const useDocuments = () => useQuery({ queryKey: qk.documents, queryFn: api.documents });
-export const useDocument = (regId: string | null, version?: number) =>
-  useQuery({ queryKey: qk.document(regId ?? "", version), queryFn: () => api.document(regId!, version), enabled: !!regId });
-export const useAudit = () => useQuery({ queryKey: qk.audit, queryFn: () => api.audit(1, 400) });
-export const useEval = () => useQuery({ queryKey: qk.eval, queryFn: api.evaluation, retry: false });
 export const useReports = () => useQuery({ queryKey: qk.reports, queryFn: api.reports });
 
 /** Review action with an optimistic status update in the queue. */
@@ -61,7 +52,6 @@ export function useReviewAction() {
       qc.invalidateQueries({ queryKey: qk.queue });
       qc.invalidateQueries({ queryKey: qk.stats });
       qc.invalidateQueries({ queryKey: qk.reports });
-      qc.invalidateQueries({ queryKey: qk.audit });
     },
   });
 }

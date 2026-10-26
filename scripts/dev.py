@@ -1,4 +1,4 @@
-"""Backend task runner: api | test | lint | eval | openapi."""
+"""Backend task runner: api | test | lint | openapi."""
 
 from __future__ import annotations
 
@@ -26,12 +26,6 @@ def main() -> None:
         sys.exit(subprocess.call([py, "-m", "pytest", "-q", *sys.argv[2:]], cwd=str(BACKEND), env=env))
     if task == "lint":
         sys.exit(subprocess.call([py, "-m", "ruff", "check", "."], cwd=str(BACKEND), env=env))
-    if task == "eval":
-        sys.path.insert(0, str(BACKEND))
-        from reglens.eval.evaluate import run_evaluation
-
-        print(json.dumps(run_evaluation(), indent=2)[:2000])
-        return
     if task == "openapi":
         sys.path.insert(0, str(BACKEND))
         from api.main import app

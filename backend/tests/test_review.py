@@ -1,10 +1,7 @@
 from datetime import date
 
 import pytest
-from sqlalchemy import select, text
 
-from reglens.audit.chain import simulate_tamper, verify_chain
-from reglens.core.models import AuditEntry, Decision
 from reglens.review.service import ReviewError, act, queue
 
 
@@ -54,25 +51,3 @@ def test_four_eyes_for_str(session):
     str_ob = next(o for o in d.obligations if o["type"] == "STR")
     assert str_ob["deadline"] == "2026-10-28" and str_ob["determined_on"] == "2026-10-19"  # 7 working days
     session.commit()
-
-
-def test_audit_chain_valid_and_tamper_detected(session):
-    report = verify_chain(session)
-    assert report.valid and report.checked > 100
-    target = session.scalars(select(AuditEntry).order_by(AuditEntry.id).offset(10).limit(1)).first()
-
-    sim = simulate_tamper(session, target.id)
-    assert not sim.valid and sim.broken_at == target.id
-    assert verify_chain(session).valid  # simulation never touches the stored log
-
-    session.execute(text("UPDATE audit_log SET payload = :p WHERE id = :i"), {"p": '{"forged":true}', "i": target.id})
-    broken = verify_chain(session)
-    assert not broken.valid and broken.broken_at == target.id
-    assert all(not b.valid for b in broken.blocks if b.id >= target.id)
-    session.rollback()
-
-
-def test_review_actions_are_audited(session):
-    approved = session.scalars(select(Decision).where(Decision.status == "approved")).first()
-    events = session.scalars(select(AuditEntry.event_type).where(AuditEntry.entity_id == str(approved.id))).all()
-    assert "REVIEW_APPROVE" in events

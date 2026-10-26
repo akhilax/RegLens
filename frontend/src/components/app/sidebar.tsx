@@ -16,7 +16,7 @@ function isActive(pathname: string, to: string) {
 export function NavList({ collapsed = false, onNavigate, layoutId = "nav-active" }: { collapsed?: boolean; onNavigate?: () => void; layoutId?: string }) {
   const { pathname } = useLocation();
   const { data: queue } = useQueue();
-  const pending = queue?.filter((d) => ["pending_review", "in_review", "awaiting_second_approval", "needs_re_review"].includes(d.status)).length;
+  const pending = queue?.filter((d) => ["pending_review", "in_review", "awaiting_second_approval"].includes(d.status)).length;
 
   return (
     <ul className="flex flex-col gap-0.5">

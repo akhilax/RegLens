@@ -3,7 +3,6 @@ import { Activity, ArrowRight, CalendarClock, ClipboardCheck, ShieldAlert, Shiel
 import { lazy, Suspense } from "react";
 import { Link } from "react-router";
 import { useStats } from "@/api/hooks";
-import { RiskBadge } from "@/components/app/badges";
 import { PageSkeleton } from "@/components/app/page-skeleton";
 import { ErrorState, PageHeader } from "@/components/app/states";
 import { Ripple } from "@/components/magic/backgrounds";
@@ -49,9 +48,9 @@ export default function Dashboard() {
   if (error) return <ErrorState error={error} onRetry={() => refetch()} />;
   if (isLoading || !s) return <PageSkeleton />;
 
-  const openReview = s.pending_review + s.in_review + s.awaiting_second_approval + s.needs_re_review;
+  const openReview = s.pending_review + s.in_review + s.awaiting_second_approval;
   const highOpen = s.risk_distribution.high ?? 0;
-  const pulse = openReview === 0 ? "calm" : highOpen > 5 || s.needs_re_review > 0 ? "elevated" : "watch";
+  const pulse = openReview === 0 ? "calm" : highOpen > 5 ? "elevated" : "watch";
   const pulseColor = pulse === "calm" ? "var(--risk-low)" : pulse === "watch" ? "var(--risk-medium)" : "var(--risk-high)";
   const risk = { low: s.risk_distribution.low ?? 0, medium: s.risk_distribution.medium ?? 0, high: s.risk_distribution.high ?? 0 };
   const total = Math.max(1, risk.low + risk.medium + risk.high);
@@ -62,7 +61,7 @@ export default function Dashboard() {
       <PageHeader
         eyebrow="Compliance overview"
         title="Good to see you. Here’s today’s exposure."
-        description={`${formatNumber(s.transactions)} transactions · ${formatINRCompact(s.volume_inr)} volume · ${s.audit_entries} audit blocks`}
+        description={`${formatNumber(s.transactions)} transactions · ${formatINRCompact(s.volume_inr)} volume`}
         actions={
           <>
             <Button variant="outline" asChild>
@@ -224,8 +223,8 @@ export default function Dashboard() {
                 <span className="font-mono">{s.approved}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Needs re-review</span>
-                <span className="flex items-center gap-1.5 font-mono">{s.needs_re_review > 0 && <RiskBadge level="medium" />}{s.needs_re_review}</span>
+                <span className="text-muted-foreground">Rejected</span>
+                <span className="font-mono">{s.rejected}</span>
               </div>
               <Button variant="secondary" size="sm" className="mt-2 w-full" asChild>
                 <Link to="/app/analysis">Open live analysis <ArrowRight /></Link>

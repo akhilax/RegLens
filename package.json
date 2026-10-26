@@ -14,7 +14,6 @@
     "test:web": "npm --prefix frontend run lint && npm --prefix frontend run typecheck",
     "lint": "node scripts/py.mjs scripts/dev.py lint && npm --prefix frontend run lint",
     "build": "npm --prefix frontend run build",
-    "eval": "node scripts/py.mjs scripts/dev.py eval",
     "gen:types": "node scripts/py.mjs scripts/dev.py openapi && npm --prefix frontend run gen:types",
     "qa": "npm --prefix frontend run qa"
   },

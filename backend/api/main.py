@@ -8,7 +8,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from api.routers import analysis, dashboard, decisions, governance, knowledge, qa, transactions
+from api.routers import analysis, dashboard, decisions, reports, transactions
 from reglens import __version__
 from reglens.config import get_settings
 from reglens.core.db import init_db, session_scope
@@ -45,5 +45,5 @@ def health() -> dict[str, str]:
     return {"status": "ok", "version": __version__}
 
 
-for module in (dashboard, transactions, analysis, decisions, knowledge, qa, governance):
+for module in (dashboard, transactions, analysis, decisions, reports):
     app.include_router(module.router, prefix="/api")

@@ -78,7 +78,6 @@ class DecisionSummary(BaseModel):
     obligations: list[Obligation]
     earliest_deadline: str | None
     approvals: list[str]
-    re_review_reason: str | None
     amount_inr: float
     channel: str
     direction: str
@@ -116,18 +115,6 @@ class RuleHitOut(BaseModel):
     evidence: list[dict[str, Any]]
 
 
-class AuditEntryOut(BaseModel):
-    id: int
-    timestamp: datetime
-    event_type: str
-    entity_type: str
-    entity_id: str
-    actor: str
-    payload: str
-    prev_hash: str
-    hash: str
-
-
 class DecisionDetail(DecisionSummary):
     features: dict[str, Any]
     rules_fired: list[RuleHitOut]
@@ -141,7 +128,6 @@ class DecisionDetail(DecisionSummary):
     llm_raw: str
     reviews: list[ReviewOut]
     transaction: TransactionOut
-    audit: list[AuditEntryOut]
 
 
 class ReviewIn(BaseModel):
@@ -178,7 +164,6 @@ class Stats(BaseModel):
     awaiting_second_approval: int
     approved: int
     rejected: int
-    needs_re_review: int
     citation_issues: int
     hallucinations_blocked: int
     volume_inr: float
@@ -189,7 +174,6 @@ class Stats(BaseModel):
     by_channel: dict[str, int]
     daily: list[DailyPoint]
     upcoming_deadlines: list[DeadlineItem]
-    audit_entries: int
     last_run: dict[str, Any] | None
 
 
@@ -214,104 +198,6 @@ class UploadResult(BaseModel):
     run_id: int | None
     inserted: int
     errors: list[str]
-
-
-class ChunkOut(BaseModel):
-    id: str
-    section: str
-    heading: str
-    text: str
-    content_hash: str
-    version: int
-    status: str
-
-
-class VersionOut(BaseModel):
-    id: int
-    version: int
-    status: str
-    effective_date: date | None
-    uploaded_at: datetime
-    uploaded_by: str
-    content_hash: str
-
-
-class DocumentOut(BaseModel):
-    id: int
-    reg_id: str
-    title: str
-    issuer: str
-    version: int
-    effective_date: date | None
-    source_url: str | None
-    status: str
-    uploaded_at: datetime
-    uploaded_by: str
-    content_hash: str
-    chunk_count: int
-    citing_decisions: int
-    versions: list[VersionOut]
-
-
-class DocumentDetail(DocumentOut):
-    banner: str
-    chunks: list[ChunkOut]
-
-
-class SectionDiffOut(BaseModel):
-    section: str
-    heading: str
-    change: str
-    old_chunk_id: str | None
-    new_chunk_id: str | None
-    old_text: str | None
-    new_text: str | None
-    old_hash: str | None
-    new_hash: str | None
-
-
-class ImpactItem(BaseModel):
-    decision_id: int
-    transaction_id: str
-    previous_status: str
-    risk_level: str
-    sections: list[str]
-    cited_chunk_ids: list[str]
-
-
-class IngestOut(BaseModel):
-    document_id: int
-    reg_id: str
-    version: int
-    status: str
-    previous_version: int | None
-    diff: list[SectionDiffOut]
-    impacted: list[ImpactItem]
-    informational: int
-
-
-class TextUploadIn(BaseModel):
-    text: str
-    uploaded_by: str = "meera"
-
-
-class BlockStatusOut(BaseModel):
-    id: int
-    hash: str
-    valid: bool
-    reason: str | None
-
-
-class ChainReportOut(BaseModel):
-    valid: bool
-    checked: int
-    broken_at: int | None
-    blocks: list[BlockStatusOut]
-    simulated: bool = False
-
-
-class TamperIn(BaseModel):
-    entry_id: int
 
 
 class ReviewerOut(BaseModel):
@@ -344,7 +230,7 @@ class MetaOut(BaseModel):
 
 
 class SearchHit(BaseModel):
-    kind: Literal["transaction", "decision", "regulation"]
+    kind: Literal["transaction", "decision"]
     id: str
     title: str
     subtitle: str

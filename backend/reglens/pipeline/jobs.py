@@ -9,7 +9,6 @@ from typing import Any
 
 from sqlalchemy import select
 
-from reglens.audit.chain import append as audit
 from reglens.config import get_settings
 from reglens.core.db import new_session
 from reglens.core.models import AnalysisRun, Decision, Transaction, utcnow
@@ -95,8 +94,6 @@ def run_batch(run_id: int, txn_ids: list[str] | None = None, pace_ms: int | None
                 time.sleep(pace)
 
         run.status, run.finished_at = "done", utcnow()
-        audit(session, "ANALYSIS_RUN_COMPLETED", "analysis_run", run_id, actor,
-              {"processed": len(todo), "flagged": flagged, "provider": run.provider})
         session.commit()
         events.push({"type": "done", "processed": len(todo), "total": len(todo), "flagged": flagged})
     except Exception as exc:  # pragma: no cover - surfaced to the UI

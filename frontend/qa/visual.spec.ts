@@ -32,10 +32,6 @@ test("screenshots of every page, both themes, desktop + mobile", async ({ page }
     ["analysis", "/app/analysis"],
     ["review", "/app/review"],
     ["trace", `/app/decisions/${decisionId}`],
-    ["knowledge", "/app/knowledge"],
-    ["ask", "/app/ask"],
-    ["audit", "/app/audit"],
-    ["evaluation", "/app/evaluation"],
     ["not-found", "/app/does-not-exist"],
   ];
 

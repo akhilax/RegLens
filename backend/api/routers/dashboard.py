@@ -6,13 +6,13 @@ from collections import Counter, defaultdict
 from datetime import date
 
 from fastapi import APIRouter, Depends, Query
-from sqlalchemy import func, or_, select
+from sqlalchemy import or_, select
 from sqlalchemy.orm import Session, selectinload
 
 from api import schemas
 from reglens import __version__
 from reglens.core.db import get_db
-from reglens.core.models import AnalysisRun, AuditEntry, Decision, RegDocument, Transaction
+from reglens.core.models import AnalysisRun, Decision, Transaction
 from reglens.kb.retriever import get_retriever
 from reglens.llm import prompts
 from reglens.llm.providers import get_provider
@@ -61,7 +61,7 @@ def stats(db: Session = Depends(get_db)) -> schemas.Stats:
         transactions=len(txns), analyzed=len(decisions), flagged=len(flagged),
         auto_cleared=status["auto_cleared"], logged=status["logged"], pending_review=status["pending_review"],
         in_review=status["in_review"], awaiting_second_approval=status["awaiting_second_approval"],
-        approved=status["approved"], rejected=status["rejected"], needs_re_review=status["needs_re_review"],
+        approved=status["approved"], rejected=status["rejected"],
         citation_issues=sum(1 for d in decisions if d.citation_issue),
         hallucinations_blocked=sum(len(d.invalid_citations) for d in decisions),
         volume_inr=round(sum(t.amount_inr for t in txns), 2),
@@ -73,7 +73,6 @@ def stats(db: Session = Depends(get_db)) -> schemas.Stats:
         daily=[schemas.DailyPoint(date=k, transactions=int(v["transactions"]), flagged=int(v["flagged"]),
                                   volume_inr=round(v["volume_inr"], 2)) for k, v in sorted(daily.items())],
         upcoming_deadlines=overdue + upcoming,
-        audit_entries=db.scalar(select(func.count(AuditEntry.id))) or 0,
         last_run=None if last_run is None else {
             "id": last_run.id, "status": last_run.status, "processed": last_run.processed,
             "flagged": last_run.flagged, "provider": last_run.provider,
@@ -88,7 +87,7 @@ def meta(db: Session = Depends(get_db)) -> schemas.MetaOut:
     provider = get_provider()
     return schemas.MetaOut(
         app="RegLens", version=__version__, llm_provider=provider.name, llm_model=provider.model,
-        prompt_versions={"analyze": prompts.ANALYZE_VERSION, "qa": prompts.QA_VERSION},
+        prompt_versions={"analyze": prompts.ANALYZE_VERSION},
         retriever=get_retriever(db).backend,
         reviewers=[schemas.ReviewerOut(**r) for r in REVIEWERS],
         rules=[schemas.RuleOut(id=r.id, name=r.name, description=r.description, severity=r.severity,
@@ -116,9 +115,4 @@ def search(q: str = Query(min_length=1, max_length=64), db: Session = Depends(ge
     for d in db.scalars(select(Decision).where(Decision.is_current, Decision.transaction_id.ilike(like)).limit(4)).all():
         hits.append(schemas.SearchHit(kind="decision", id=str(d.id), title=f"Decision #{d.id} ({d.transaction_id})",
                                       subtitle=f"{d.status} · {d.risk_level} risk", href=f"/app/decisions/{d.id}"))
-    for doc in db.scalars(select(RegDocument).where(
-            RegDocument.status == "active", or_(RegDocument.reg_id.ilike(like), RegDocument.title.ilike(like)))
-            .limit(4)).all():
-        hits.append(schemas.SearchHit(kind="regulation", id=doc.reg_id, title=doc.title,
-                                      subtitle=f"{doc.reg_id} v{doc.version}", href=f"/app/knowledge?doc={doc.reg_id}"))
     return hits

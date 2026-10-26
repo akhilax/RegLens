@@ -2,11 +2,10 @@
 
 from __future__ import annotations
 
-from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from api import schemas
-from reglens.core.models import Account, AuditEntry, Customer, Decision, Transaction
+from reglens.core.models import Account, Customer, Decision, Transaction
 from reglens.core.utils import mask_account
 from reglens.review.service import current_round_approvals, earliest_deadline
 
@@ -39,7 +38,7 @@ def summary_fields(d: Decision, cust: Customer) -> dict:
         routing_reasons=d.routing_reasons, rules=[h["rule_id"] for h in d.rules_fired],
         obligations=[schemas.Obligation(**o) for o in d.obligations],
         earliest_deadline=None if deadline.startswith("9999") else deadline,
-        approvals=[a.reviewer for a in current_round_approvals(d)], re_review_reason=d.re_review_reason,
+        approvals=[a.reviewer for a in current_round_approvals(d)],
         amount_inr=t.amount_inr, channel=t.channel, direction=t.direction, timestamp=t.timestamp,
         customer_type=cust.type, customer_name=cust.name, counterparty_country=t.counterparty_country,
         created_at=d.created_at,
@@ -51,18 +50,8 @@ def decision_summary(session: Session, d: Decision) -> schemas.DecisionSummary:
     return schemas.DecisionSummary(**summary_fields(d, cust))
 
 
-def audit_out(e: AuditEntry) -> schemas.AuditEntryOut:
-    return schemas.AuditEntryOut(id=e.id, timestamp=e.timestamp, event_type=e.event_type, entity_type=e.entity_type,
-                                 entity_id=e.entity_id, actor=e.actor, payload=e.payload, prev_hash=e.prev_hash,
-                                 hash=e.hash)
-
-
 def decision_detail(session: Session, d: Decision) -> schemas.DecisionDetail:
     acc, cust = _parties(session, d.transaction)
-    audits = session.scalars(
-        select(AuditEntry).where(AuditEntry.entity_type == "decision", AuditEntry.entity_id == str(d.id))
-        .order_by(AuditEntry.id)
-    ).all()
     return schemas.DecisionDetail(
         **summary_fields(d, cust),
         features=d.features, rules_fired=[schemas.RuleHitOut(**h) for h in d.rules_fired],
@@ -71,5 +60,5 @@ def decision_detail(session: Session, d: Decision) -> schemas.DecisionDetail:
         prompt_version=d.prompt_version, latency_ms=d.latency_ms, llm_raw=d.llm_raw,
         reviews=[schemas.ReviewOut(id=r.id, reviewer=r.reviewer, action=r.action, comment=r.comment,
                                    modifications=r.modifications, created_at=r.created_at) for r in d.reviews],
-        transaction=txn_out(d.transaction, acc, cust, d), audit=[audit_out(e) for e in audits],
+        transaction=txn_out(d.transaction, acc, cust, d),
     )

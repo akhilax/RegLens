@@ -244,13 +244,23 @@ export default function DecisionTrace() {
                 {tab === "history" && (
                   <Timeline
                     items={[
-                      ...d.audit.map((a) => ({
-                        key: `a${a.id}`,
-                        tone: a.event_type.startsWith("REVIEW_APPROVE") ? ("low" as const) : a.event_type.includes("REJECT") ? ("high" as const) : ("brand" as const),
+                      {
+                        key: "analysed",
+                        tone: "brand" as const,
                         content: (
                           <div>
-                            <div className="flex items-center gap-2 text-xs font-medium">{a.event_type}<span className="font-normal text-muted-foreground">by {a.actor}</span></div>
-                            <div className="text-[11px] text-muted-foreground">{formatDateTime(a.timestamp)} · block #{a.id} · {shortHash(a.hash, 6)}</div>
+                            <div className="text-xs font-medium">Analysed<span className="ml-2 font-normal text-muted-foreground">by {d.model_name}</span></div>
+                            <div className="text-[11px] text-muted-foreground">{formatDateTime(d.created_at)}</div>
+                          </div>
+                        ),
+                      },
+                      ...d.reviews.map((r) => ({
+                        key: `r${r.id}`,
+                        tone: r.action === "approve" || r.action === "modify" ? ("low" as const) : r.action === "reject" ? ("high" as const) : ("brand" as const),
+                        content: (
+                          <div>
+                            <div className="text-xs font-medium capitalize">{r.action.replace("_", " ")}<span className="ml-2 font-normal normal-case text-muted-foreground">by {r.reviewer}</span></div>
+                            <div className="text-[11px] text-muted-foreground">{formatDateTime(r.created_at)}{r.comment ? ` · “${r.comment}”` : ""}</div>
                           </div>
                         ),
                       })),

@@ -9,7 +9,7 @@ import { spring } from "@/lib/motion";
 import { applyTheme, useUI } from "@/store/ui";
 import { NAV } from "./nav";
 
-const KIND_ICON = { transaction: Receipt, decision: Hash, regulation: FileText } as const;
+const KIND_ICON = { transaction: Receipt, decision: Hash } as const;
 
 export function CommandPalette() {
   const open = useUI((s) => s.paletteOpen);

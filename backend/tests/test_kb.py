@@ -6,7 +6,6 @@ from reglens.core.models import RegChunk, RegDocument
 from reglens.core.utils import sha256
 from reglens.kb.parser import RegulationParseError, parse_regulation
 from reglens.kb.retriever import HybridRetriever
-from reglens.kb.store import ingest
 
 DOC = """---
 reg_id: TEST-REG
@@ -48,21 +47,6 @@ def test_seed_corpus_has_stable_ids(session):
     assert "RBI-KYC-MD@v1#sec38" in ids
     for doc in session.scalars(select(RegDocument)).all():
         assert "DEMO SUMMARY" in doc.raw_text
-
-
-def test_versioning_supersedes_and_diffs(session):
-    first = ingest(session, DOC)
-    assert first.status == "created"
-    same = ingest(session, DOC)
-    assert same.status == "unchanged"
-    v2 = DOC.replace("version: 1", "version: 2").replace("five lakh", "seven lakh")
-    second = ingest(session, v2)
-    assert second.status == "new_version" and second.version == 2 and second.previous_version == 1
-    changes = {d.section: d.change for d in second.diff}
-    assert changes == {"s1": "unchanged", "s2": "changed"}
-    old = session.get(RegChunk, "TEST-REG@v1#s2")
-    assert old.status == "superseded"
-    assert session.get(RegChunk, "TEST-REG@v2#s2").status == "active"
 
 
 def test_hybrid_retrieval_and_metadata_filter(session):

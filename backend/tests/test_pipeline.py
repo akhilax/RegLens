@@ -3,7 +3,6 @@ from sqlalchemy import select
 from reglens.config import get_settings
 from reglens.core.models import Decision
 from reglens.core.synthetic import read_ground_truth
-from reglens.eval.evaluate import run_evaluation
 from reglens.kb.retriever import get_retriever
 from reglens.llm.providers import MockLLMProvider
 from reglens.llm.schema import parse_analysis
@@ -91,12 +90,3 @@ def test_mock_retry_recovers(session):
     retried = [d for d in _current(session).values() if d.output.get("llm_errors")]
     assert retried, "some transactions should exercise the retry path"
     assert all(not d.fallback_used for d in retried)
-
-
-def test_evaluation_report(session, seeded):
-    report = run_evaluation(session)
-    assert report["rules"]["f1"] == 1.0
-    assert report["obligations"]["recall"] == 1.0
-    assert report["regulations"]["recall"] == 1.0
-    assert 0 < report["routing"]["pct_routed"] < 0.2
-    assert report["citations"]["invalid_stripped"] > 0

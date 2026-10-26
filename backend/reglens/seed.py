@@ -1,4 +1,4 @@
-"""Seed everything: synthetic data, regulatory KB, full analysis and evaluation."""
+"""Seed everything: synthetic data, regulatory KB and a full analysis run."""
 
 from __future__ import annotations
 
@@ -8,7 +8,6 @@ import time
 from datetime import date, datetime
 from pathlib import Path
 
-from reglens.audit.chain import append as audit
 from reglens.config import get_settings
 from reglens.core.db import init_db, session_scope
 from reglens.core.models import Account, Customer, Transaction
@@ -60,8 +59,6 @@ def seed_all(analyze: bool = True, quiet: bool = False) -> dict:
     with session_scope() as s:
         n = load_synthetic(s, settings.synthetic_dir)
         results = ingest_directory(s, settings.regulations_dir)
-        audit(s, "SEED", "system", "seed", "system", {"customers": n[0], "accounts": n[1], "transactions": n[2],
-                                                       "documents": [f"{r.reg_id}@v{r.version}" for r in results]})
     log(f"Ingested {len(results)} regulatory documents")
 
     with session_scope() as s:
@@ -70,14 +67,10 @@ def seed_all(analyze: bool = True, quiet: bool = False) -> dict:
 
     summary: dict = {"documents": len(results), "transactions": n[2]}
     if analyze:
-        from reglens.eval.evaluate import run_evaluation
         from reglens.pipeline.jobs import start_run
 
         run_id = start_run(source="seed", pace_ms=0, background=False)
-        report = run_evaluation()
-        summary.update(run_id=run_id, eval=report)
-        log(f"Analysis run #{run_id} complete. Rules F1={report['rules']['f1']:.3f}, "
-            f"obligations F1={report['obligations']['f1']:.3f}, regulations F1={report['regulations']['f1']:.3f}, "
-            f"routed={report['routing']['pct_routed']:.1%}")
+        summary.update(run_id=run_id)
+        log(f"Analysis run #{run_id} complete.")
     log(f"Seed finished in {time.perf_counter() - t0:.1f}s")
     return summary

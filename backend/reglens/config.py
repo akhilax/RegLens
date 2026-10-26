@@ -29,8 +29,6 @@ class Settings:
     llm_provider: str = field(default_factory=lambda: _env("LLM_PROVIDER", "mock").lower())
     llm_model: str = field(default_factory=lambda: _env("LLM_MODEL", "claude-sonnet-5-5"))
     anthropic_api_key: str = field(default_factory=lambda: _env("ANTHROPIC_API_KEY", ""))
-    ollama_url: str = field(default_factory=lambda: _env("OLLAMA_URL", "http://localhost:11434"))
-    ollama_model: str = field(default_factory=lambda: _env("OLLAMA_MODEL", "llama3.1"))
     embedder: str = field(default_factory=lambda: _env("REGLENS_EMBEDDER", "auto").lower())
     vector_store: str = field(default_factory=lambda: _env("REGLENS_VECTOR_STORE", "auto").lower())
     analysis_pace_ms: int = field(default_factory=lambda: int(_env("ANALYSIS_PACE_MS", "12")))

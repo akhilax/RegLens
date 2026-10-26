@@ -33,9 +33,8 @@ def test_decision_trace(client):
     queue = client.get("/api/review/queue").json()
     assert queue
     detail = client.get(f"/api/decisions/{queue[0]['id']}").json()
-    for key in ("features", "rules_fired", "retrieved", "output", "model_name", "prompt_version", "audit"):
+    for key in ("features", "rules_fired", "retrieved", "output", "model_name", "prompt_version", "reviews"):
         assert key in detail
-    assert detail["audit"][0]["event_type"] == "ANALYSIS_COMPLETED"
 
 
 def test_review_flow_and_reports(client):
@@ -50,45 +49,6 @@ def test_review_flow_and_reports(client):
     csv = client.get("/api/reports/CTR.csv")
     assert csv.status_code == 200 and "DRAFT" in csv.text and d["transaction_id"] in csv.text
     assert "X" in csv.text.split("\n")[2]  # masked account
-
-
-def test_kb_amendment_impact(client):
-    docs = client.get("/api/kb/documents").json()
-    assert {d["reg_id"] for d in docs} >= {"PML-RULES-2005", "RBI-KYC-MD", "FEMA-LRS"}
-    out = client.post("/api/kb/demo-amendment").json()
-    assert out["status"] == "new_version" and out["version"] == 2
-    changed = {d["section"] for d in out["diff"] if d["change"] == "changed"}
-    assert changed == {"rule3-1-b", "rule8-2"}
-    assert out["impacted"], "decisions citing the changed clauses must be flagged"
-    queue = client.get("/api/review/queue").json()
-    assert any(q["status"] == "needs_re_review" for q in queue)
-    diff = client.get("/api/kb/documents/PML-RULES-2005/diff", params={"from_version": 1, "to_version": 2}).json()
-    assert len(diff) == len(out["diff"])
-
-
-def test_qa_stream_with_citations(client):
-    with client.stream("GET", "/api/qa/stream", params={"q": "When must a cash transaction report be filed?"}) as r:
-        events = [json.loads(line[6:]) for line in r.iter_lines() if line.startswith("data: ")]
-    assert events[0]["type"] == "retrieved" and events[-1]["type"] == "done"
-    assert any(e["type"] == "token" for e in events)
-    assert events[-1]["citations"] and not events[-1]["invalid_citations"]
-
-
-def test_audit_verify_and_simulation(client):
-    v = client.get("/api/audit/verify").json()
-    assert v["valid"] and v["checked"] > 0
-    log = client.get("/api/audit", params={"page_size": 5}).json()
-    target = log["items"][-1]["id"]
-    sim = client.post("/api/audit/simulate-tamper", json={"entry_id": target}).json()
-    assert not sim["valid"] and sim["broken_at"] == target and sim["simulated"]
-    assert client.get("/api/audit/verify").json()["valid"]
-
-
-def test_eval_and_search(client):
-    assert client.post("/api/eval/run").json()["rules"]["f1"] == 1.0
-    assert client.get("/api/eval").status_code == 200
-    hits = client.get("/api/search", params={"q": "T0001"}).json()
-    assert any(h["kind"] == "transaction" for h in hits)
 
 
 def test_batch_run_streams_events(client):
@@ -109,3 +69,8 @@ def test_csv_upload(client):
         events = [json.loads(line[6:]) for line in s.iter_lines() if line.startswith("data: ")]
     flagged = [e for e in events if e["type"] == "decision"]
     assert flagged and "R-CTR" in flagged[0]["rules"]
+
+
+def test_search(client):
+    hits = client.get("/api/search", params={"q": "T0001"}).json()
+    assert any(h["kind"] == "transaction" for h in hits)

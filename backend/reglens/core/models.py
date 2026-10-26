@@ -84,7 +84,7 @@ class Decision(Base):
     transaction_id: Mapped[str] = mapped_column(ForeignKey("transactions.id"), index=True)
     run_id: Mapped[int | None] = mapped_column(ForeignKey("analysis_runs.id"), nullable=True)
     is_current: Mapped[bool] = mapped_column(Boolean, default=True, index=True)
-    # auto_cleared | pending_review | in_review | awaiting_second_approval | approved | rejected | needs_re_review
+    # auto_cleared | logged | pending_review | in_review | awaiting_second_approval | approved | rejected
     status: Mapped[str] = mapped_column(String(32), index=True)
     risk_level: Mapped[str] = mapped_column(String(8))
     risk_score: Mapped[float] = mapped_column(Float, default=0.0)
@@ -106,7 +106,6 @@ class Decision(Base):
     model_name: Mapped[str] = mapped_column(String(64))
     prompt_version: Mapped[str] = mapped_column(String(32))
     latency_ms: Mapped[float] = mapped_column(Float, default=0.0)
-    re_review_reason: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow, onupdate=utcnow)
 
@@ -126,20 +125,6 @@ class ReviewAction(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
 
     decision: Mapped[Decision] = relationship(back_populates="reviews")
-
-
-class AuditEntry(Base):
-    __tablename__ = "audit_log"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    timestamp: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
-    event_type: Mapped[str] = mapped_column(String(48), index=True)
-    entity_type: Mapped[str] = mapped_column(String(32))
-    entity_id: Mapped[str] = mapped_column(String(64))
-    actor: Mapped[str] = mapped_column(String(64))
-    payload: Mapped[str] = mapped_column(Text)  # canonical JSON string (hashed verbatim)
-    prev_hash: Mapped[str] = mapped_column(String(64))
-    hash: Mapped[str] = mapped_column(String(64), unique=True)
 
 
 class RegDocument(Base):

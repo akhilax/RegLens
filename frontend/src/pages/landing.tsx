@@ -5,8 +5,6 @@ import {
   Bot,
   Cpu,
   FileSearch,
-  GitCompareArrows,
-  Link2,
   ListChecks,
   type LucideIcon,
   Receipt,
@@ -41,7 +39,6 @@ const PIPELINE: { key: string; label: string; icon: LucideIcon; note: string }[]
   { key: "llm", label: "LLM", icon: Bot, note: "Strict JSON reasoning" },
   { key: "guard", label: "Guardrail", icon: ShieldAlert, note: "Citations must be retrieved" },
   { key: "human", label: "Human", icon: UserCheck, note: "Four-eyes for STR" },
-  { key: "audit", label: "Audit", icon: Link2, note: "Hash-chained, tamper-evident" },
 ];
 
 const REGS = [
@@ -60,7 +57,7 @@ function Pipeline() {
   const nodeRefs = PIPELINE.map((_, i) => ({ get current() { return refs.current[i]; } }) as RefObject<HTMLDivElement | null>);
 
   return (
-    <div ref={container} className="relative mx-auto grid max-w-6xl grid-cols-1 gap-6 sm:gap-8 lg:grid-cols-7 lg:gap-6">
+    <div ref={container} className="relative mx-auto grid max-w-6xl grid-cols-1 gap-6 sm:gap-8 lg:grid-cols-6 lg:gap-6">
       {PIPELINE.map((step, i) => (
         <m.div
           key={step.key}
@@ -142,10 +139,8 @@ const FEATURES: { title: string; body: string; icon: LucideIcon; className: stri
   { title: "Hybrid reasoning", body: "Rules own every threshold and deadline. The LLM explains applicability — it never invents a number.", icon: Cpu, className: "md:col-span-3" },
   { title: "Citation guardrail", body: "Every regulation the model cites must be a chunk retrieved for that request. Hallucinated citations are stripped and routed to a human.", icon: ShieldAlert, className: "md:col-span-3" },
   { title: "Four-eyes approval", body: "Nothing becomes reportable without a human. STR candidates need two distinct reviewers.", icon: Users, className: "md:col-span-2" },
-  { title: "Tamper-evident audit", body: "Analyses, reviews and KB changes are hash-chained. One edited byte breaks the chain.", icon: Link2, className: "md:col-span-2" },
-  { title: "Regulation change impact", body: "Upload a new version, see the clause diff and every decision that cited a superseded clause.", icon: GitCompareArrows, className: "md:col-span-2" },
-  { title: "Runs fully offline", body: "A deterministic mock LLM, local embeddings and SQLite. Plug in Claude or Ollama with one env var.", icon: WifiOff, className: "md:col-span-3" },
-  { title: "Traceable knowledge base", body: "Section-aware chunks with stable IDs, SHA-256 hashes and versions — every answer points to a clause.", icon: BookOpenCheck, className: "md:col-span-3" },
+  { title: "Runs fully offline", body: "A deterministic mock LLM, local embeddings and SQLite. Plug in Claude with one env var.", icon: WifiOff, className: "md:col-span-2" },
+  { title: "Traceable knowledge base", body: "Section-aware chunks with stable IDs, SHA-256 hashes and versions — every answer points to a clause.", icon: BookOpenCheck, className: "md:col-span-2" },
 ];
 
 export default function Landing() {
@@ -249,10 +244,10 @@ export default function Landing() {
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <BlurFade className="mx-auto mb-14 max-w-2xl text-center">
             <p className="text-xs font-medium uppercase tracking-[0.18em] text-brand">How it works</p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">Seven steps. Every one recorded.</h2>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">Six steps. Every one traceable.</h2>
             <p className="mt-3 text-muted-foreground">
               A transaction flows through deterministic rules, hybrid retrieval and a constrained LLM, then a guardrail
-              and a human — and every hop lands in a hash-chained audit trail.
+              and a human — and every step is recorded on the decision.
             </p>
           </BlurFade>
           <m.div variants={staggerContainer(0.08)} initial="hidden" whileInView="show" viewport={{ once: true, margin: "-80px" }}>
@@ -264,7 +259,7 @@ export default function Landing() {
       <section id="features" className="py-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <BlurFade className="mb-10 max-w-2xl">
-            <p className="text-xs font-medium uppercase tracking-[0.18em] text-brand">Built for audit, not for demos</p>
+            <p className="text-xs font-medium uppercase tracking-[0.18em] text-brand">Built for trust</p>
             <h2 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">Trust is a feature you can verify.</h2>
           </BlurFade>
           <BentoGrid inView>

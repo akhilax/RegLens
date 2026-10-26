@@ -146,8 +146,6 @@ function build(d: DecisionDetail, selectedChunk: string | null) {
     tone: d.status === "approved" ? "ok" : d.status === "rejected" ? "bad" : "warn",
   }, 6);
   link("guard", "human", 6);
-  add("audit", 6, 0, 1, { kind: "audit", title: `Audit · ${d.audit.length} block(s)`, subtitle: d.audit.map((a) => a.event_type).slice(-2).join(" → "), meta: d.audit.length ? shortHash(d.audit[d.audit.length - 1].hash, 8) : undefined, tone: "brand" }, 7);
-  link("human", "audit", 7);
   return { nodes, edges };
 }
 
@@ -155,7 +153,7 @@ function Graph({ decision, selectedChunk, onSelectChunk }: Props) {
   const [step, setStep] = useState(0);
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const t = setInterval(() => setStep((s) => (s >= 7 ? s : s + 1)), reduce ? 10 : 420);
+    const t = setInterval(() => setStep((s) => (s >= 6 ? s : s + 1)), reduce ? 10 : 420);
     return () => clearInterval(t);
   }, [decision.id]);
   const { nodes, edges } = useMemo(() => build(decision, selectedChunk), [decision, selectedChunk]);

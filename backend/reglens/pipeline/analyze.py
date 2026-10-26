@@ -10,10 +10,8 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
-from reglens.audit.chain import append as audit
 from reglens.config import get_settings
 from reglens.core.models import Account, Customer, Decision, Transaction
-from reglens.core.utils import canonical_json, sha256
 from reglens.kb.retriever import HybridRetriever, get_retriever
 from reglens.llm import prompts
 from reglens.llm.providers import LLMProvider, LLMRequest, get_provider
@@ -178,12 +176,6 @@ def analyze_transaction(session: Session, txn: Transaction, flat: dict[str, Any]
     )
     session.add(decision)
     session.flush()
-    audit(session, "ANALYSIS_COMPLETED", "decision", decision.id, actor, {
-        "transaction_id": txn.id, "rules_fired": [h["rule_id"] for h in hits],
-        "retrieved": [{"id": c["chunk_id"], "hash": c["content_hash"]} for c in chunks],
-        "model": decision.model_name, "prompt_version": decision.prompt_version,
-        "output_hash": sha256(canonical_json(output)), "status": status, "risk_level": risk_level,
-    })
     return decision
 
 

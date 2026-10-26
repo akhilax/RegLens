@@ -6,7 +6,6 @@ import json
 from typing import Any
 
 ANALYZE_VERSION = "analyze@v1.2"
-QA_VERSION = "qa@v1.1"
 
 ANALYZE_SYSTEM = """You are RegLens, a compliance analyst assistant for an Indian bank.
 You explain which regulations apply to a transaction. Deterministic rules have ALREADY computed every
@@ -40,12 +39,3 @@ def analyze_user(features: dict[str, Any], rules: list[dict[str, Any]], chunks: 
 
 
 REPAIR_USER = "Your previous reply was not valid JSON for the required schema ({error}). Reply with ONLY the JSON object."
-
-QA_SYSTEM = """You are RegLens, answering questions about Indian AML/KYC/tax/FEMA regulations using ONLY the
-provided clauses. Cite every factual statement with the chunk ID in square brackets, e.g. [PML-RULES-2005@v1#rule3-1-a].
-If the clauses do not answer the question, say so. Be concise (under 180 words). This is not legal advice."""
-
-
-def qa_user(question: str, chunks: list[dict[str, Any]]) -> str:
-    clauses = "\n\n".join(f"[{c['chunk_id']}] {c['heading']}\n{c['text']}" for c in chunks)
-    return f"CLAUSES:\n{clauses}\n\nQUESTION: {question}"

@@ -1,6 +1,6 @@
 import confetti from "canvas-confetti";
 import { AnimatePresence, LayoutGroup, m } from "motion/react";
-import { ArrowRight, Check, Download, FileDown, GitBranch, Pencil, PlayCircle, ShieldAlert, Users, X } from "lucide-react";
+import { ArrowRight, Check, Download, FileDown, Pencil, PlayCircle, ShieldAlert, Users, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
 import { toast } from "sonner";
@@ -28,7 +28,7 @@ import { cn } from "@/lib/utils";
 import { useUI } from "@/store/ui";
 
 const COLUMNS = [
-  { id: "pending", title: "Pending", states: ["pending_review", "needs_re_review"] },
+  { id: "pending", title: "Pending", states: ["pending_review"] },
   { id: "review", title: "In review", states: ["in_review", "awaiting_second_approval"] },
   { id: "approved", title: "Approved", states: ["approved"] },
   { id: "rejected", title: "Rejected", states: ["rejected"] },
@@ -77,7 +77,6 @@ function QueueCard({ d, selected, onOpen }: { d: DecisionSummary; selected: bool
           {d.earliest_deadline ? countdownLabel(d.earliest_deadline) : "no deadline"}
         </span>
         {isStr && d.status === "awaiting_second_approval" && <span className="rounded bg-accent px-1.5 font-mono text-accent-foreground">1/2</span>}
-        {d.status === "needs_re_review" && <span className="flex items-center gap-1 text-risk-medium"><GitBranch className="size-3" />re-review</span>}
       </m.div>
     </m.button>
   );
@@ -162,7 +161,6 @@ function DetailPanel({ d, onClose }: { d: DecisionSummary; onClose: () => void }
             {d.routing_reasons.map((r) => <span key={r} className="rounded-md border border-border px-1.5 py-0.5 font-mono">{r}</span>)}
           </div>
         )}
-        {d.re_review_reason && <p className="rounded-xl border border-risk-medium/30 bg-risk-medium-bg p-3 text-xs text-risk-medium">{d.re_review_reason}</p>}
 
         {d.requires_four_eyes && (
           <div className="flex items-center gap-3 rounded-xl border border-border bg-accent/30 p-3">
@@ -217,7 +215,7 @@ function DetailPanel({ d, onClose }: { d: DecisionSummary; onClose: () => void }
             </m.div>
           ) : (
             <m.div key="actions" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="flex flex-wrap items-center gap-2">
-              {(d.status === "pending_review" || d.status === "needs_re_review") && (
+              {d.status === "pending_review" && (
                 <Button variant="secondary" onClick={() => run("start_review")} disabled={mutation.isPending}>
                   <PlayCircle /> Start review
                 </Button>
