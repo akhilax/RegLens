@@ -1,6 +1,6 @@
 import confetti from "canvas-confetti";
 import { AnimatePresence, LayoutGroup, m } from "motion/react";
-import { ArrowRight, Check, Download, FileDown, Pencil, PlayCircle, ShieldAlert, Users, X } from "lucide-react";
+import { ArrowRight, Check, Download, FileDown, ShieldAlert, Users, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
 import { toast } from "sonner";
@@ -22,7 +22,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/overlay";
-import { Kbd, Select, Textarea } from "@/components/ui/primitives";
+import { Kbd, Textarea } from "@/components/ui/primitives";
 import { countdownLabel, formatDate, formatINR } from "@/lib/format";
 import { spring } from "@/lib/motion";
 import { cn } from "@/lib/utils";
@@ -87,15 +87,14 @@ function DetailPanel({ d, onClose }: { d: DecisionSummary; onClose: () => void }
   const reviewer = useUI((s) => s.reviewer);
   const { data: meta } = useMeta();
   const mutation = useReviewAction();
-  const [mode, setMode] = useState<"none" | "reject" | "modify">("none");
+  const [mode, setMode] = useState<"none" | "reject">("none");
   const [comment, setComment] = useState("");
-  const [risk, setRisk] = useState(d.risk_level);
   const [justApproved, setJustApproved] = useState(false);
   const me = meta?.reviewers.find((r) => r.id === reviewer);
   const closed = d.status === "approved" || d.status === "rejected";
   const alreadyApproved = d.approvals.includes(reviewer);
 
-  const run = (action: "start_review" | "approve" | "reject" | "modify", extra: { comment?: string; modifications?: Record<string, unknown> } = {}) =>
+  const run = (action: "approve" | "reject", extra: { comment?: string; modifications?: Record<string, unknown> } = {}) =>
     mutation.mutate(
       { id: d.id, body: { reviewer, action, comment: extra.comment ?? null, modifications: extra.modifications ?? null } },
       {
@@ -192,35 +191,16 @@ function DetailPanel({ d, onClose }: { d: DecisionSummary; onClose: () => void }
             <m.p key="closed" className="text-sm text-muted-foreground">This decision is closed.</m.p>
           ) : mode !== "none" ? (
             <m.div key="form" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-2">
-              <Textarea autoFocus value={comment} onChange={(e) => setComment(e.target.value)} placeholder={mode === "reject" ? "Why is this not reportable? (required)" : "What did you change and why? (required)"} aria-label="Reviewer comment" />
-              {mode === "modify" && (
-                <label className="flex items-center gap-2 text-xs text-muted-foreground">
-                  Risk level
-                  <Select value={risk} onChange={(e) => setRisk(e.target.value)}>
-                    <option value="low">low</option>
-                    <option value="medium">medium</option>
-                    <option value="high">high</option>
-                  </Select>
-                </label>
-              )}
+              <Textarea autoFocus value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Why is this not reportable? (required)" aria-label="Reviewer comment" />
               <div className="flex gap-2">
-                <Button
-                  variant={mode === "reject" ? "destructive" : "default"}
-                  disabled={!comment.trim() || mutation.isPending}
-                  onClick={() => run(mode, { comment, modifications: mode === "modify" ? { risk_level: risk, note: comment } : undefined })}
-                >
-                  {mode === "reject" ? "Confirm reject" : "Save & approve"}
+                <Button variant="destructive" disabled={!comment.trim() || mutation.isPending} onClick={() => run("reject", { comment })}>
+                  Confirm reject
                 </Button>
                 <Button variant="ghost" onClick={() => setMode("none")}>Cancel</Button>
               </div>
             </m.div>
           ) : (
             <m.div key="actions" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="flex flex-wrap items-center gap-2">
-              {d.status === "pending_review" && (
-                <Button variant="secondary" onClick={() => run("start_review")} disabled={mutation.isPending}>
-                  <PlayCircle /> Start review
-                </Button>
-              )}
               {d.requires_four_eyes ? (
                 <HoldToApprove
                   disabled={mutation.isPending || alreadyApproved}
@@ -232,9 +212,6 @@ function DetailPanel({ d, onClose }: { d: DecisionSummary; onClose: () => void }
                   <Check /> Approve <Kbd className="ml-1 border-black/20 bg-black/10 text-black/70">A</Kbd>
                 </Button>
               )}
-              <Button variant="outline" onClick={() => setMode("modify")}>
-                <Pencil /> Modify
-              </Button>
               <Button variant="ghost" className="text-risk-high" onClick={() => setMode("reject")}>
                 <X /> Reject <Kbd className="ml-1">R</Kbd>
               </Button>
