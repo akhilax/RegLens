@@ -2,7 +2,7 @@
 
 **Checks bank transactions against Indian compliance rules, explains which regulations apply, and sends anything important to a person for approval.**
 
-![Landing](docs/screenshots/landing-dark-desktop.png)
+![Landing](docs/screenshots/landing-dark-desktop.png) 
 
 > Educational hackathon prototype – not legal advice. Regulation texts are simplified summaries. All data is fake. 
 
