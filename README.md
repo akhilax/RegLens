@@ -4,7 +4,7 @@
 
 ![Landing](docs/screenshots/landing-dark-desktop.png)
 
-> Educational hackathon prototype – not legal advice. Regulation texts are simplified summaries. All data is fake.
+> Educational hackathon prototype – not legal advice. Regulation texts are simplified summaries. All data is fake. 
 
 ## What it does
 1. **Rules flag transactions** – 10 fixed rules (big cash, structuring, foreign transfers, PEPs, risky countries, missing PAN, KYC due, …). See `RegLens-Flagging-Rules.pdf`.
